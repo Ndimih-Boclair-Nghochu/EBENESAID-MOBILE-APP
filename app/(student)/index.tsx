@@ -145,6 +145,11 @@ function DashboardHeader({ overview }: { overview: StudentOverview }) {
           label="Programs"
           onPress={() => router.push('/(student)/programs')}
         />
+        <QuickAction
+          icon="people-outline"
+          label="Community"
+          onPress={() => router.push('/(student)/community')}
+        />
       </View>
 
       <Card style={styles.nextStepsCard}>
@@ -274,6 +279,7 @@ const styles = StyleSheet.create({
   },
   quickActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.sm
   },
   quickAction: {
@@ -282,11 +288,11 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 16,
     borderWidth: 1,
-    flex: 1,
     gap: spacing.xs,
     minHeight: 82,
     justifyContent: 'center',
-    padding: spacing.sm
+    padding: spacing.sm,
+    width: '48%'
   },
   quickActionText: {
     ...typography.label,
