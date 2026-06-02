@@ -52,6 +52,21 @@ export default function StudentLayout() {
         }}
       />
       <Tabs.Screen
+        name="food"
+        options={{
+          title: 'Food',
+          tabBarIcon: ({ focused, color, size }) => (
+            <TabBarIcon
+              focused={focused}
+              activeName="restaurant"
+              inactiveName="restaurant-outline"
+              color={color}
+              size={size}
+            />
+          )
+        }}
+      />
+      <Tabs.Screen
         name="jobs"
         options={{
           title: 'Jobs',
@@ -60,21 +75,6 @@ export default function StudentLayout() {
               focused={focused}
               activeName="briefcase"
               inactiveName="briefcase-outline"
-              color={color}
-              size={size}
-            />
-          )
-        }}
-      />
-      <Tabs.Screen
-        name="community"
-        options={{
-          title: 'Community',
-          tabBarIcon: ({ focused, color, size }) => (
-            <TabBarIcon
-              focused={focused}
-              activeName="people"
-              inactiveName="people-outline"
               color={color}
               size={size}
             />
@@ -96,7 +96,13 @@ export default function StudentLayout() {
           )
         }}
       />
+      <Tabs.Screen name="community" options={{ href: null }} />
+      <Tabs.Screen name="documents" options={{ href: null }} />
+      <Tabs.Screen name="arrival" options={{ href: null }} />
+      <Tabs.Screen name="programs" options={{ href: null }} />
+      <Tabs.Screen name="support" options={{ href: null }} />
+      <Tabs.Screen name="edit-profile" options={{ href: null }} />
+      <Tabs.Screen name="change-password" options={{ href: null }} />
     </Tabs>
   );
 }
-
