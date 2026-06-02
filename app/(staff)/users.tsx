@@ -11,7 +11,7 @@ import { EmptyState } from '@/src/components/ui/EmptyState';
 import { ErrorState } from '@/src/components/ui/ErrorState';
 import { colors, radius, spacing, typography } from '@/src/constants';
 import { api } from '@/src/lib/api';
-import { extractArray, getString, statusTone, type PartnerRecord } from '@/src/features/partner/screens';
+import { extractArray, getString, PartnerLoadingScreen, statusTone, type PartnerRecord } from '@/src/features/partner/screens';
 
 export default function StaffUsersScreen() {
   const [search, setSearch] = useState('');
@@ -32,6 +32,10 @@ export default function StaffUsersScreen() {
         .includes(term)
     );
   }, [query.data, search]);
+
+  if (query.isLoading) {
+    return <PartnerLoadingScreen portalName="Users" subtitle="Loading user directory." />;
+  }
 
   if (query.isError) {
     return (
@@ -83,4 +87,3 @@ const styles = StyleSheet.create({
   userName: { ...typography.headingSmall },
   userMeta: { ...typography.caption }
 });
-

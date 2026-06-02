@@ -37,6 +37,7 @@ import {
   studentQueryTimes
 } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
+import { requestOrQueue } from '@/src/lib/offlineQueue';
 
 type RequestMode = 'enquiry' | 'booking';
 type RequestSection = 'closed' | 'open';
@@ -69,12 +70,22 @@ export default function StudentHousingScreen() {
   });
 
   const favoriteMutation = useMutation({
-    mutationFn: ({ listingId, saved }: { listingId: number; saved: boolean }) =>
-      api.post('/api/student/housing', {
+    mutationFn: ({ listingId, saved }: { listingId: number; saved: boolean }) => {
+      const body = {
         action: 'favorite',
         listingId,
         saved
-      }),
+      };
+
+      return requestOrQueue(
+        {
+          endpoint: '/api/student/housing',
+          method: 'POST',
+          body
+        },
+        () => api.post('/api/student/housing', body)
+      );
+    },
     onMutate: async ({ listingId, saved }) => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<HousingResponse>(queryKey);

@@ -28,6 +28,7 @@ import {
 } from '@/src/features/student/phase3';
 import { formatRelativeTime } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
+import { requestOrQueue } from '@/src/lib/offlineQueue';
 import { useAuthStore } from '@/src/stores/authStore';
 
 async function fetchConversation(conversationId: number) {
@@ -66,11 +67,21 @@ export default function ConversationScreen() {
   }, [conversationId]);
 
   const sendMutation = useMutation({
-    mutationFn: (messageContent: string) =>
-      api.post('/api/student/messages', {
+    mutationFn: (messageContent: string) => {
+      const body = {
         conversationId,
         content: messageContent
-      }),
+      };
+
+      return requestOrQueue(
+        {
+          endpoint: '/api/student/messages',
+          method: 'POST',
+          body
+        },
+        () => api.post('/api/student/messages', body)
+      );
+    },
     onMutate: async (messageContent) => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<ConversationDetailResponse>(queryKey);

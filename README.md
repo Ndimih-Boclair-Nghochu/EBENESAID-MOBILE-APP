@@ -1,59 +1,78 @@
 # EBENESAID Mobile App
 
-EBENESAID is a multi-role relocation platform for international students, residents, housing agents, food suppliers, employers, transport operators, universities, investors, staff, and admins. This repository contains only the Expo React Native mobile frontend. The backend is the separate Next.js app at `https://ebenesaid.com`.
+EBENESAID is a multi-role relocation platform for students, residents, housing agents, food suppliers, job partners, transport operators, universities, investors, staff, and admins. This repository contains only the Expo React Native mobile frontend. The backend is the separate Next.js app at `https://ebenesaid.com`.
 
 ## Setup
 
-1. Install dependencies:
+```bash
+npm install
+cp .env.example .env.local
+npx expo start
+```
 
-   ```bash
-   npm install
-   ```
+Run on simulators:
 
-2. Copy the environment example:
+```bash
+npm run ios
+npm run android
+```
 
-   ```bash
-   cp .env.example .env.local
-   ```
+## Environment Variables
 
-3. Start Expo:
-
-   ```bash
-   npx expo start
-   ```
-
-## API URL
-
-The app reads `EXPO_PUBLIC_API_URL` from `.env.local`. The default value is:
+`.env.local`:
 
 ```bash
 EXPO_PUBLIC_API_URL=https://ebenesaid.com
 ```
 
-Cookie-based sessions use the `eb_session` cookie. Session tokens are never stored in MMKV or AsyncStorage.
+The app uses cookie-based sessions with the `eb_session` cookie. Session tokens are never stored in MMKV or AsyncStorage.
 
-## Running Locally
+## Build
 
-Run on iOS simulator:
-
-```bash
-npm run ios
-```
-
-Run on Android emulator:
+Install EAS CLI, then build:
 
 ```bash
-npm run android
+npx eas build --platform ios
+npx eas build --platform android
+npx eas build --platform all
 ```
+
+## Phase Summary
+
+- Phase 1: Expo SDK 51 foundation, design system, auth flow, cookie session API client, role routing, and portal shells.
+- Phase 2: Student and resident portal screens for dashboard, housing, food, jobs, documents, arrival, programs, profile, password, and support.
+- Phase 3: Messaging and community screens, including conversations, chat UI, circles, events, buddies, and circle chat.
+- Phase 4: Partner portals for agents, suppliers, job partners, transport, universities, investors, and staff.
+- Phase 5: Admin portal, push notifications, offline queue, biometric login polish, app store config, assets, and final documentation.
+
+## Role Testing Guide
+
+- `student`: Home, Housing, Jobs, Messages, Profile, Documents, Arrival, Programs, Support.
+- `resident`: Student/resident service hub with student-only screens gated where appropriate.
+- `agent`: Listings, bookings, verification, profile.
+- `supplier`: Menu, orders, payouts, profile.
+- `job_partner`: Jobs, applicants, profile.
+- `transport`: Fleet, pickups, services, revenue, profile.
+- `university`: Programs, applications, AI chat, profile.
+- `investor`: Read-only investor dashboard and profile.
+- `staff`: Dashboard, users, support, reports, profile.
+- `admin`: Dashboard, users, operations, content, settings, and all admin queues.
 
 ## Folder Structure
 
-- `app/` contains Expo Router route groups for auth, bootstrap, and each portal.
-- `src/constants/` contains the design system colors, typography, and spacing.
-- `src/types/` contains shared API and user types.
-- `src/lib/` contains API, query cache, session, and storage helpers.
-- `src/stores/` contains Zustand auth and profile stores.
-- `src/hooks/` contains auth, offline status, and biometrics hooks.
-- `src/components/ui/` contains reusable UI primitives.
-- `src/components/layout/` contains screen and portal layout helpers.
+- `app/`: Expo Router route groups for auth and every role portal.
+- `src/components/ui/`: Base design system primitives.
+- `src/components/partner/`: Shared partner/admin portal UI.
+- `src/features/student/`: Student portal helpers and Phase 3 message/community types.
+- `src/features/partner/`: Reusable partner/admin screen builders.
+- `src/lib/`: API client, storage, query cache, notifications, offline queue, config.
+- `src/stores/`: Zustand auth and user profile stores.
+
+## Known Limitations and TODOs
+
+- Replace placeholder app icons and splash assets before app store submission.
+- Document uploads currently use placeholder storage keys; Firebase Storage upload is reserved for a later backend integration pass.
+- Calendar integration in Community Events is stubbed.
+- Admin finance combines multiple endpoint payloads defensively because backend response shapes may vary.
+- Push token registration currently PATCHes the student profile endpoint and stores the token locally if a role endpoint does not accept it.
 

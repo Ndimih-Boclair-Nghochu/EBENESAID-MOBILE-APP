@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -18,22 +18,37 @@ import { colors, spacing, typography } from '@/src/constants';
 import { getApiMessage, getHttpStatus, useAuth } from '@/src/hooks/useAuth';
 import { useBiometrics } from '@/src/hooks/useBiometrics';
 import { getPortalRoute } from '@/src/lib/roleRoutes';
+import { storage } from '@/src/lib/storage';
+
+const LAST_EMAIL_KEY = 'last_email';
 
 export default function LoginScreen() {
-  const { login, probeSession, user, isLoading } = useAuth();
+  const { login, probeSession, isLoading } = useAuth();
   const biometrics = useBiometrics();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | undefined>();
   const [biometricLoading, setBiometricLoading] = useState(false);
+  const [lastEmail, setLastEmail] = useState<string | null>(null);
 
-  const canUseBiometrics = biometrics.isAvailable && Boolean(user);
+  const canUseBiometrics = biometrics.isAvailable && Boolean(lastEmail);
+
+  useEffect(() => {
+    const savedEmail = storage.getString(LAST_EMAIL_KEY) ?? null;
+    setLastEmail(savedEmail);
+
+    if (savedEmail && !email) {
+      setEmail(savedEmail);
+    }
+  }, [email]);
 
   const handleLogin = async () => {
     setError(undefined);
 
     try {
       await login(email.trim(), password);
+      storage.set(LAST_EMAIL_KEY, email.trim());
+      setLastEmail(email.trim());
     } catch (loginError) {
       const status = getHttpStatus(loginError);
 
@@ -66,6 +81,11 @@ export default function LoginScreen() {
       const sessionUser = await probeSession();
       router.replace(getPortalRoute(sessionUser.userType));
     } catch {
+      if (lastEmail) {
+        setEmail(lastEmail);
+      }
+
+      setError('Session expired. Enter your password to sign in again.');
       toast.error('Session expired. Please sign in again.');
     } finally {
       setBiometricLoading(false);
@@ -176,4 +196,3 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   }
 });
-

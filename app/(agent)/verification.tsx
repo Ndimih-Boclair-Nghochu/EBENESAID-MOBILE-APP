@@ -14,7 +14,7 @@ import { ErrorState } from '@/src/components/ui/ErrorState';
 import { toast } from '@/src/components/ui/Toast';
 import { colors, radius, spacing, typography } from '@/src/constants';
 import { api } from '@/src/lib/api';
-import { extractArray, extractRecord, getString, statusTone, type PartnerRecord } from '@/src/features/partner/screens';
+import { extractArray, extractRecord, getString, PartnerLoadingScreen, statusTone, type PartnerRecord } from '@/src/features/partner/screens';
 
 export default function AgentVerificationScreen() {
   const [documentName, setDocumentName] = useState('');
@@ -44,6 +44,10 @@ export default function AgentVerificationScreen() {
       toast.error('Unable to submit document.');
     }
   });
+
+  if (query.isLoading) {
+    return <PartnerLoadingScreen portalName="Verification" subtitle="Loading verification documents." />;
+  }
 
   if (query.isError) {
     return (
@@ -113,4 +117,3 @@ const styles = StyleSheet.create({
   documentCard: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.sm, marginHorizontal: spacing.xl },
   documentTitle: { ...typography.body, flex: 1, fontWeight: '600' }
 });
-

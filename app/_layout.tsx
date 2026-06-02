@@ -12,10 +12,27 @@ import { OfflineBanner } from '@/src/components/ui/OfflineBanner';
 import { ToastHost } from '@/src/components/ui/Toast';
 import { colors } from '@/src/constants';
 import { useOfflineStatus } from '@/src/hooks/useOfflineStatus';
+import {
+  requestPushNotificationsIfNeeded,
+  setupNotificationListeners
+} from '@/src/lib/notifications';
 import { initializeQueryPersistence, queryClient } from '@/src/lib/queryClient';
+import { useAuthStore } from '@/src/stores/authStore';
 
 function AppChrome() {
   const isOffline = useOfflineStatus();
+  const isAuthenticated = useAuthStore((store) => store.isAuthenticated);
+
+  useEffect(() => {
+    const cleanup = setupNotificationListeners();
+    return cleanup;
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      void requestPushNotificationsIfNeeded();
+    }
+  }, [isAuthenticated]);
 
   return (
     <>
@@ -56,4 +73,3 @@ const styles = StyleSheet.create({
     flex: 1
   }
 });
-

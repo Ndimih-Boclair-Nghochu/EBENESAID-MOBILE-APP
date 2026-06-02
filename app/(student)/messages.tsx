@@ -32,6 +32,7 @@ import {
 } from '@/src/features/student/phase3';
 import { formatRelativeTime } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
+import { requestOrQueue } from '@/src/lib/offlineQueue';
 import { useAuthStore } from '@/src/stores/authStore';
 
 async function fetchMessages() {
@@ -70,17 +71,32 @@ export default function MessagesScreen() {
   });
 
   const newConversationMutation = useMutation({
-    mutationFn: ({ content, recipientId }: { content: string; recipientId: number }) =>
-      api.post('/api/student/messages', {
+    mutationFn: ({ content, recipientId }: { content: string; recipientId: number }) => {
+      const body = {
         content,
         recipientUserId: recipientId
-      }),
+      };
+
+      return requestOrQueue(
+        {
+          endpoint: '/api/student/messages',
+          method: 'POST',
+          body
+        },
+        () => api.post('/api/student/messages', body)
+      );
+    },
     onSuccess: (response) => {
       toast.success('Message sent.');
       setRecipientUserId('');
       setNewMessage('');
       sheetRef.current?.close();
       void query.refetch();
+
+      if ('queued' in response) {
+        return;
+      }
+
       const conversationId = extractConversationId(response.data);
 
       if (conversationId) {

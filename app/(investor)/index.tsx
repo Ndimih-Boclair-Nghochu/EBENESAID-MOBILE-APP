@@ -12,7 +12,7 @@ import { EmptyState } from '@/src/components/ui/EmptyState';
 import { ErrorState } from '@/src/components/ui/ErrorState';
 import { colors, spacing, typography } from '@/src/constants';
 import { api } from '@/src/lib/api';
-import { extractArray, extractRecord, formatValue, getNumber, getString, type PartnerRecord } from '@/src/features/partner/screens';
+import { extractArray, extractRecord, formatValue, getNumber, getString, PartnerLoadingScreen, type PartnerRecord } from '@/src/features/partner/screens';
 
 export default function InvestorSummaryScreen() {
   const query = useQuery<unknown>({
@@ -21,6 +21,10 @@ export default function InvestorSummaryScreen() {
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60
   });
+
+  if (query.isLoading) {
+    return <PartnerLoadingScreen portalName="Investor Dashboard" subtitle="Loading platform performance." />;
+  }
 
   if (query.isError) {
     return (
@@ -98,4 +102,3 @@ const styles = StyleSheet.create({
   track: { backgroundColor: colors.neutralSoft, borderRadius: 9999, height: 10, overflow: 'hidden' },
   fill: { backgroundColor: colors.secondary, height: '100%' }
 });
-

@@ -26,6 +26,7 @@ import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { ErrorState } from '@/src/components/ui/ErrorState';
+import { SkeletonLoader } from '@/src/components/ui/SkeletonLoader';
 import { toast } from '@/src/components/ui/Toast';
 import { colors, radius, spacing, typography } from '@/src/constants';
 import { useAuth } from '@/src/hooks/useAuth';
@@ -921,18 +922,40 @@ function joinValues(record: PartnerRecord, keys: string[]): string {
     .join(' • ');
 }
 
-function LoadingPortalScreen({ portalName, subtitle }: { portalName: string; subtitle: string }) {
+export function PartnerLoadingScreen({ portalName, subtitle }: { portalName: string; subtitle: string }) {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.content}>
         <PartnerHeader portalName={portalName} subtitle={subtitle} />
-        {metricGrid([
-          { key: 'a', label: 'Loading', value: '...' },
-          { key: 'b', label: 'Loading', value: '...' }
-        ])}
+        <View style={styles.metricGrid}>
+          <View style={styles.metricRow}>
+            <Card style={styles.skeletonCard}>
+              <SkeletonLoader width="56%" height={14} />
+              <SkeletonLoader width="72%" height={32} />
+            </Card>
+            <Card style={styles.skeletonCard}>
+              <SkeletonLoader width="56%" height={14} />
+              <SkeletonLoader width="72%" height={32} />
+            </Card>
+          </View>
+          <Card style={styles.skeletonCard}>
+            <SkeletonLoader width="48%" height={20} />
+            <SkeletonLoader width="100%" height={14} />
+            <SkeletonLoader width="78%" height={14} />
+          </Card>
+          <Card style={styles.skeletonCard}>
+            <SkeletonLoader width="62%" height={20} />
+            <SkeletonLoader width="100%" height={14} />
+            <SkeletonLoader width="68%" height={14} />
+          </Card>
+        </View>
       </View>
     </SafeAreaView>
   );
+}
+
+function LoadingPortalScreen({ portalName, subtitle }: { portalName: string; subtitle: string }) {
+  return <PartnerLoadingScreen portalName={portalName} subtitle={subtitle} />;
 }
 
 function PartnerErrorScreen({ title, onRetry }: { title: string; onRetry: () => void }) {
@@ -1105,5 +1128,9 @@ const styles = StyleSheet.create({
   profileFooter: {
     gap: spacing.md,
     paddingTop: spacing.md
+  },
+  skeletonCard: {
+    flex: 1,
+    gap: spacing.md
   }
 });

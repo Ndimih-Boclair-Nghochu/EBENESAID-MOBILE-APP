@@ -8,7 +8,7 @@ import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
 import { ErrorState } from '@/src/components/ui/ErrorState';
 import { colors, spacing, typography } from '@/src/constants';
 import { api } from '@/src/lib/api';
-import { extractArray, extractRecord, formatDate, formatValue, getString, type PartnerRecord } from '@/src/features/partner/screens';
+import { extractArray, extractRecord, formatDate, formatValue, getString, PartnerLoadingScreen, type PartnerRecord } from '@/src/features/partner/screens';
 
 export default function SupplierPayoutsScreen() {
   const query = useQuery<unknown>({
@@ -17,6 +17,10 @@ export default function SupplierPayoutsScreen() {
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60
   });
+
+  if (query.isLoading) {
+    return <PartnerLoadingScreen portalName="Payouts" subtitle="Loading payout records." />;
+  }
 
   if (query.isError) {
     return <ErrorState title="Unable to load payouts" onRetry={() => void query.refetch()} />;
@@ -54,4 +58,3 @@ const styles = StyleSheet.create({
   highlight: { backgroundColor: colors.successSoft, borderRadius: 16, padding: spacing.xs },
   sectionTitle: { ...typography.headingSmall }
 });
-

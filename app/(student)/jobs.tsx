@@ -28,6 +28,7 @@ import {
   studentQueryTimes
 } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
+import { requestOrQueue } from '@/src/lib/offlineQueue';
 
 type JobsTab = 'browse' | 'applications';
 type JobsListItem = JobPost | JobApplication;
@@ -55,12 +56,22 @@ export default function StudentJobsScreen() {
   });
 
   const saveMutation = useMutation({
-    mutationFn: ({ jobId, saved }: { jobId: number; saved: boolean }) =>
-      api.post('/api/jobs', {
+    mutationFn: ({ jobId, saved }: { jobId: number; saved: boolean }) => {
+      const body = {
         action: 'save',
         jobId,
         saved
-      }),
+      };
+
+      return requestOrQueue(
+        {
+          endpoint: '/api/jobs',
+          method: 'POST',
+          body
+        },
+        () => api.post('/api/jobs', body)
+      );
+    },
     onMutate: async ({ jobId, saved }) => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<JobsResponse>(queryKey);
