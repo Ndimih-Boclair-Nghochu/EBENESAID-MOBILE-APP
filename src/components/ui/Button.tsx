@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
-  Text,
   type GestureResponderEvent,
   type PressableProps,
   type StyleProp,
@@ -13,6 +12,8 @@ import {
 } from 'react-native';
 
 import { colors, radius, typography } from '@/src/constants';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 

@@ -1,8 +1,17 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
-import { Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient } from '@tanstack/react-query';
+import { useMemo,
+  useState } from 'react';
+import { Pressable,
+  RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Badge } from '@/src/components/ui/Badge';
@@ -29,6 +38,8 @@ import {
 } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
 import { requestOrQueue } from '@/src/lib/offlineQueue';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type JobsTab = 'browse' | 'applications';
 type JobsListItem = JobPost | JobApplication;

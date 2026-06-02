@@ -1,9 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { colors, spacing, typography } from '@/src/constants';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export default function StaffReportsScreen() {
   return (

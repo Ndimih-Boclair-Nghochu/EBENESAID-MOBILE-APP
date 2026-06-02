@@ -1,6 +1,12 @@
-import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
-import { RefreshControl, StyleSheet, Text, View } from 'react-native';
+import {
+  FlashList } from '@shopify/flash-list';
+import { keepPreviousData,
+  useMutation,
+  useQuery } from '@tanstack/react-query';
+import { RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
@@ -13,6 +19,8 @@ import { toast } from '@/src/components/ui/Toast';
 import { colors, spacing, typography } from '@/src/constants';
 import { extractArray, getRecordId, getString, PartnerLoadingScreen, statusTone, type PartnerRecord } from '@/src/features/partner/screens';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export default function AdminVerificationScreen() {
   const query = useQuery<unknown>({

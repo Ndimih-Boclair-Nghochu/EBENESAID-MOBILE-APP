@@ -1,7 +1,13 @@
 import axios from 'axios';
-import { router } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import {
+  router } from 'expo-router';
+import { useCallback,
+  useEffect,
+  useState } from 'react';
+import { Image,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorState } from '@/src/components/ui/ErrorState';
@@ -11,6 +17,8 @@ import { api } from '@/src/lib/api';
 import { getPortalRoute } from '@/src/lib/roleRoutes';
 import { useAuthStore } from '@/src/stores/authStore';
 import type { AuthMeResponse, SafeUser } from '@/src/types';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 const brandLogo = require('../assets/ebenesaid-logo.jpeg');
 

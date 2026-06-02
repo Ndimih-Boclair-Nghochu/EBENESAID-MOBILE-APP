@@ -12,6 +12,7 @@ import { OfflineBanner } from '@/src/components/ui/OfflineBanner';
 import { ToastHost } from '@/src/components/ui/Toast';
 import { colors } from '@/src/constants';
 import { useOfflineStatus } from '@/src/hooks/useOfflineStatus';
+import { I18nProvider } from '@/src/lib/i18n';
 import {
   requestPushNotificationsIfNeeded,
   setupNotificationListeners
@@ -50,18 +51,20 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
-        <QueryClientProvider client={queryClient}>
-          <StatusBar style="dark" backgroundColor={colors.background} />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: {
-                backgroundColor: colors.background
-              }
-            }}
-          />
-          <AppChrome />
-        </QueryClientProvider>
+        <I18nProvider>
+          <QueryClientProvider client={queryClient}>
+            <StatusBar style="dark" backgroundColor={colors.background} />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: {
+                  backgroundColor: colors.background
+                }
+              }}
+            />
+            <AppChrome />
+          </QueryClientProvider>
+        </I18nProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

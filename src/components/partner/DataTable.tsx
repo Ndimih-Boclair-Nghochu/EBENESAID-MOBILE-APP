@@ -1,6 +1,8 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { colors, spacing, typography } from '@/src/constants';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 interface DataTableProps {
   headers: string[];

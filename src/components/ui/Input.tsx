@@ -1,15 +1,17 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
   type TextInputProps,
   View
 } from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 
 import { colors, radius, spacing, typography } from '@/src/constants';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 

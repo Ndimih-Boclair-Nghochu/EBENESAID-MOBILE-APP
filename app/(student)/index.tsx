@@ -1,8 +1,14 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData,
+  useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { RefreshControl, Pressable, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl,
+  Pressable,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Badge } from '@/src/components/ui/Badge';
@@ -26,6 +32,8 @@ import {
   studentQueryTimes
 } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type Activity = StudentOverview['recentActivity'][number];
 

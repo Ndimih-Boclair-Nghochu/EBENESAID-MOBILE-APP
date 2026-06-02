@@ -1,11 +1,12 @@
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import {
+  router } from 'expo-router';
+import { useEffect,
+  useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,6 +21,8 @@ import { getApiMessage, getHttpStatus, useAuth } from '@/src/hooks/useAuth';
 import { useBiometrics } from '@/src/hooks/useBiometrics';
 import { getPortalRoute } from '@/src/lib/roleRoutes';
 import { storage } from '@/src/lib/storage';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 const LAST_EMAIL_KEY = 'last_email';
 

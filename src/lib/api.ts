@@ -5,7 +5,7 @@ import { toast } from '@/src/components/ui/Toast';
 import { useAuthStore } from '@/src/stores/authStore';
 
 import { API_URL } from './config';
-import { getSessionCookieHeader, persistSetCookieHeader } from './storage';
+import { getSessionCookieHeader, getSessionToken, persistSetCookieHeader } from './storage';
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -13,17 +13,22 @@ export const api = axios.create({
   withCredentials: true,
   headers: {
     Accept: 'application/json',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'X-EBENESAID-Client': 'mobile'
   }
 });
 
-function setCookieHeader(config: InternalAxiosRequestConfig, cookieHeader: string): void {
+function setHeader(config: InternalAxiosRequestConfig, name: string, value: string): void {
   if (typeof config.headers.set === 'function') {
-    config.headers.set('Cookie', cookieHeader);
+    config.headers.set(name, value);
     return;
   }
 
-  config.headers.Cookie = cookieHeader;
+  config.headers[name] = value;
+}
+
+function setCookieHeader(config: InternalAxiosRequestConfig, cookieHeader: string): void {
+  setHeader(config, 'Cookie', cookieHeader);
 }
 
 function isAuthSessionCheck(url: unknown): boolean {
@@ -31,10 +36,18 @@ function isAuthSessionCheck(url: unknown): boolean {
 }
 
 api.interceptors.request.use(async (config) => {
-  const cookieHeader = await getSessionCookieHeader();
+  const [cookieHeader, sessionToken] = await Promise.all([
+    getSessionCookieHeader(),
+    getSessionToken()
+  ]);
 
   if (cookieHeader) {
     setCookieHeader(config, cookieHeader);
+  }
+
+  if (sessionToken) {
+    setHeader(config, 'Authorization', `Bearer ${sessionToken}`);
+    setHeader(config, 'X-EBENESAID-Session', sessionToken);
   }
 
   return config;

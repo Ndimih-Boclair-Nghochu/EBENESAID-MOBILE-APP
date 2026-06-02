@@ -1,8 +1,17 @@
 import BottomSheet from '@gorhom/bottom-sheet';
-import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
-import { useMemo, useRef, useState } from 'react';
-import { RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  FlashList } from '@shopify/flash-list';
+import { keepPreviousData,
+  useMutation,
+  useQuery } from '@tanstack/react-query';
+import { useMemo,
+  useRef,
+  useState } from 'react';
+import { RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Badge } from '@/src/components/ui/Badge';
@@ -31,6 +40,8 @@ import {
 } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
 import { useAuthStore } from '@/src/stores/authStore';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type ProgramsTab = 'browse' | 'applications';
 type ProgramsListItem = SchoolProgram | ProgramApplication;

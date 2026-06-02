@@ -1,8 +1,18 @@
-import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
+import {
+  FlashList } from '@shopify/flash-list';
+import { keepPreviousData,
+  useMutation,
+  useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { Pressable, RefreshControl, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { useMemo,
+  useState } from 'react';
+import { Pressable,
+  RefreshControl,
+  StyleSheet,
+  Switch,
+  View
+} from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
@@ -23,6 +33,8 @@ import {
   type PartnerRecord
 } from '@/src/features/partner/screens';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 const filters = [
   { label: 'All', value: 'all' },

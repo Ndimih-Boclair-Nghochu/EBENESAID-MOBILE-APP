@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '@/src/components/ui/Avatar';
@@ -10,6 +10,8 @@ import { colors, spacing, typography } from '@/src/constants';
 import { useAuth } from '@/src/hooks/useAuth';
 
 import { ScreenHeader } from './ScreenHeader';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 interface StudentTabPlaceholderProps {
   title: string;

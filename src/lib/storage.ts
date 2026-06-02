@@ -39,6 +39,10 @@ async function getSessionCookieValue(): Promise<string | null> {
   return SecureStore.getItemAsync(SESSION_COOKIE_STORAGE_KEY);
 }
 
+export async function getSessionToken(): Promise<string | null> {
+  return getSessionCookieValue();
+}
+
 async function setSessionCookieValue(value: string): Promise<void> {
   await SecureStore.setItemAsync(SESSION_COOKIE_STORAGE_KEY, value);
 }
@@ -132,7 +136,24 @@ function getSessionCandidateFromPayload(payload: unknown): unknown {
   }
 
   const record = payload as Record<string, unknown>;
-  return record[SESSION_COOKIE_NAME] ?? record.sessionCookie ?? record.session_cookie;
+  const nestedSession = record.session;
+
+  if (typeof nestedSession === 'object' && nestedSession !== null) {
+    const sessionRecord = nestedSession as Record<string, unknown>;
+    const nestedCandidate = sessionRecord.token ?? sessionRecord.sessionToken ?? sessionRecord.session_token;
+
+    if (nestedCandidate) {
+      return nestedCandidate;
+    }
+  }
+
+  return (
+    record[SESSION_COOKIE_NAME] ??
+    record.sessionToken ??
+    record.session_token ??
+    record.sessionCookie ??
+    record.session_cookie
+  );
 }
 
 export async function persistSessionFromAuthPayload(payload: unknown): Promise<void> {

@@ -1,10 +1,19 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
+import { keepPreviousData,
+  useMutation,
+  useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useRef, useState } from 'react';
-import { Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useRef,
+  useState } from 'react';
+import { Pressable,
+  RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Badge } from '@/src/components/ui/Badge';
@@ -30,6 +39,8 @@ import {
 } from '@/src/features/student/phase3';
 import { formatDate } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type CommunityTab = 'circles' | 'events' | 'buddies';
 type CommunityListItem = CommunityCircle | CommunityEvent | BuddyMatch;

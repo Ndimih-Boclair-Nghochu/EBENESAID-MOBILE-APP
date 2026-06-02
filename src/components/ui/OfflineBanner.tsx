@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import {
+  useEffect } from 'react';
+import { StyleSheet
+} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,6 +10,8 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { spacing, typography } from '@/src/constants';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 interface OfflineBannerProps {
   visible: boolean;

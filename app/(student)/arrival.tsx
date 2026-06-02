@@ -1,9 +1,18 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
+import { keepPreviousData,
+  useMutation,
+  useQuery } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import { useState } from 'react';
-import { Pressable, RefreshControl, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Pressable,
+  RefreshControl,
+  StyleSheet,
+  Switch,
+  View
+} from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Badge } from '@/src/components/ui/Badge';
@@ -26,6 +35,8 @@ import type {
 } from '@/src/features/student/types';
 import { formatDate, statusTone, studentQueryTimes } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 const travelOptions: Array<{ value: TravelType; label: string; icon: keyof typeof Ionicons.glyphMap }> = [
   { value: 'airport_pickup', label: 'Airport Pickup', icon: 'airplane-outline' },

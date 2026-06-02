@@ -1,9 +1,14 @@
-import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  Ionicons } from '@expo/vector-icons';
+import { StyleSheet,
+  View
+} from 'react-native';
 
 import { colors, spacing, typography } from '@/src/constants';
 
 import { Button } from './Button';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 interface ErrorStateProps {
   title: string;

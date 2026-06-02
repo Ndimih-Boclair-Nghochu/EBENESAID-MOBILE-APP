@@ -1,7 +1,13 @@
-import { FlashList } from '@shopify/flash-list';
+import {
+  FlashList } from '@shopify/flash-list';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
-import { RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useMemo,
+  useState } from 'react';
+import { RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
@@ -12,6 +18,8 @@ import { ErrorState } from '@/src/components/ui/ErrorState';
 import { colors, radius, spacing, typography } from '@/src/constants';
 import { api } from '@/src/lib/api';
 import { extractArray, getString, PartnerLoadingScreen, statusTone, type PartnerRecord } from '@/src/features/partner/screens';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export default function StaffUsersScreen() {
   const [search, setSearch] = useState('');

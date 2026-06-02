@@ -1,6 +1,10 @@
-import { FlashList } from '@shopify/flash-list';
+import {
+  FlashList } from '@shopify/flash-list';
 import { useQuery } from '@tanstack/react-query';
-import { RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
@@ -13,6 +17,8 @@ import { colors, spacing, typography } from '@/src/constants';
 import { extractArray, extractRecord, getRecordId, getString, PartnerLoadingScreen, type PartnerRecord } from '@/src/features/partner/screens';
 import { useAuth } from '@/src/hooks/useAuth';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type SettingsItem = PartnerRecord & { section: 'institution' | 'employer' };
 

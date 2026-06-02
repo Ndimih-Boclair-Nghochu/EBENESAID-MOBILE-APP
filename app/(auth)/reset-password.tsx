@@ -1,11 +1,13 @@
-import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import {
+  router,
+  useLocalSearchParams } from 'expo-router';
+import { useMemo,
+  useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,6 +20,8 @@ import { toast } from '@/src/components/ui/Toast';
 import { colors, spacing, typography } from '@/src/constants';
 import { getApiMessage, useAuth } from '@/src/hooks/useAuth';
 import { isPasswordStrong } from '@/src/lib/password';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export default function ResetPasswordScreen() {
   const { token } = useLocalSearchParams<{ token?: string | string[] }>();

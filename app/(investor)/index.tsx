@@ -1,7 +1,11 @@
-import { FlashList } from '@shopify/flash-list';
+import {
+  FlashList } from '@shopify/flash-list';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { MetricCard } from '@/src/components/partner/MetricCard';
@@ -13,6 +17,8 @@ import { ErrorState } from '@/src/components/ui/ErrorState';
 import { colors, spacing, typography } from '@/src/constants';
 import { api } from '@/src/lib/api';
 import { extractArray, extractRecord, formatValue, getNumber, getString, PartnerLoadingScreen, type PartnerRecord } from '@/src/features/partner/screens';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export default function InvestorSummaryScreen() {
   const query = useQuery<unknown>({

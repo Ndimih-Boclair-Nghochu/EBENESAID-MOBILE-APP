@@ -1,6 +1,8 @@
-import { StyleSheet, Text, type StyleProp, type TextStyle } from 'react-native';
+import { StyleSheet, type StyleProp, type TextStyle } from 'react-native';
 
 import { colors, radius } from '@/src/constants';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export type BadgeTone = 'success' | 'warning' | 'error' | 'info' | 'default';
 export type BadgeSize = 'small' | 'medium';

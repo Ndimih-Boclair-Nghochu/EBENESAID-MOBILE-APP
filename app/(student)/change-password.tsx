@@ -1,7 +1,14 @@
-import { useMutation } from '@tanstack/react-query';
+import {
+  useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useMemo,
+  useState } from 'react';
+import { KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/src/components/ui/Button';
@@ -12,6 +19,8 @@ import { toast } from '@/src/components/ui/Toast';
 import { colors, spacing, typography } from '@/src/constants';
 import { isPasswordStrong } from '@/src/lib/password';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export default function ChangePasswordScreen() {
   const [currentPassword, setCurrentPassword] = useState('');

@@ -1,8 +1,10 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 import { colors, radius, spacing, typography } from '@/src/constants';
 
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 const brandLogo = require('../../../assets/ebenesaid-logo.jpeg');
 

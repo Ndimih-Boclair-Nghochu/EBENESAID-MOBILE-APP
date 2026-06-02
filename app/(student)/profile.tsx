@@ -1,9 +1,15 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData,
+  useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { Pressable,
+  RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Badge } from '@/src/components/ui/Badge';
@@ -21,6 +27,8 @@ import type { StudentProfile } from '@/src/features/student/types';
 import { studentQueryTimes } from '@/src/features/student/utils';
 import { useAuth } from '@/src/hooks/useAuth';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type ProfileRow =
   | { id: 'documents'; title: string; subtitle: string; icon: keyof typeof Ionicons.glyphMap; route: '/(student)/documents' }

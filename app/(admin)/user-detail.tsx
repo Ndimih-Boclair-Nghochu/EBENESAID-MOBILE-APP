@@ -1,8 +1,17 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
-import { Pressable, RefreshControl, StyleSheet, Switch, Text, View } from 'react-native';
+import { keepPreviousData,
+  useMutation,
+  useQuery } from '@tanstack/react-query';
+import { router,
+  useLocalSearchParams } from 'expo-router';
+import { Pressable,
+  RefreshControl,
+  StyleSheet,
+  Switch,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
@@ -22,6 +31,8 @@ import {
   type PartnerRecord
 } from '@/src/features/partner/screens';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 const userTypes = ['student', 'resident', 'agent', 'supplier', 'job_partner', 'transport', 'university', 'investor', 'staff', 'admin'];
 

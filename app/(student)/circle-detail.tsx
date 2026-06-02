@@ -1,18 +1,25 @@
-import { Ionicons } from '@expo/vector-icons';
-import { FlashList, type FlashListRef } from '@shopify/flash-list';
+import {
+  Ionicons } from '@expo/vector-icons';
+import { FlashList,
+  type FlashListRef } from '@shopify/flash-list';
 import { useIsFocused } from '@react-navigation/native';
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useRef, useState } from 'react';
+import { keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient } from '@tanstack/react-query';
+import { router,
+  useLocalSearchParams } from 'expo-router';
+import { useMemo,
+  useRef,
+  useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
   View
 } from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/src/components/ui/EmptyState';
@@ -30,6 +37,8 @@ import {
 import { formatRelativeTime } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
 import { useAuthStore } from '@/src/stores/authStore';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 async function fetchCommunity() {
   const response = await api.get<CommunityResponse>('/api/student/community');

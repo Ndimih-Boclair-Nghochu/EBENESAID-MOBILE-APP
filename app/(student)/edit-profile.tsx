@@ -1,8 +1,17 @@
-import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
+import {
+  FlashList } from '@shopify/flash-list';
+import { keepPreviousData,
+  useMutation,
+  useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
-import { RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useEffect,
+  useMemo,
+  useState } from 'react';
+import { RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/src/components/ui/Button';
@@ -14,6 +23,8 @@ import { PagePadding, ProgressBar, ScreenSkeleton } from '@/src/features/student
 import type { StudentProfile } from '@/src/features/student/types';
 import { studentQueryTimes } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type EditableProfile = Pick<
   StudentProfile,

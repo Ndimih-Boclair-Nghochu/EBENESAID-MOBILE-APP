@@ -1,17 +1,25 @@
-import { Ionicons } from '@expo/vector-icons';
-import { FlashList, type FlashListRef } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Ionicons } from '@expo/vector-icons';
+import { FlashList,
+  type FlashListRef } from '@shopify/flash-list';
+import { keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient } from '@tanstack/react-query';
+import { router,
+  useLocalSearchParams } from 'expo-router';
+import { useEffect,
+  useMemo,
+  useRef,
+  useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
   View
 } from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/src/components/ui/EmptyState';
@@ -30,6 +38,8 @@ import { formatRelativeTime } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
 import { requestOrQueue } from '@/src/lib/offlineQueue';
 import { useAuthStore } from '@/src/stores/authStore';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 async function fetchConversation(conversationId: number) {
   const response = await api.get<ConversationDetailResponse>('/api/student/messages', {

@@ -1,11 +1,17 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
 import { Card } from '@/src/components/ui/Card';
 import { colors, spacing, typography } from '@/src/constants';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 const sections = [
   { title: 'Housing Admin', route: '/(admin)/housing-admin', icon: 'business-outline' },

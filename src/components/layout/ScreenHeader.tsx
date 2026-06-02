@@ -1,8 +1,14 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable,
+  StyleSheet,
+  View
+} from 'react-native';
 
 import { colors, spacing, typography } from '@/src/constants';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 interface ScreenHeaderProps {
   title: string;

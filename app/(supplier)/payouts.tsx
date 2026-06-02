@@ -1,5 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  useQuery } from '@tanstack/react-query';
+import { StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DataTable } from '@/src/components/partner/DataTable';
@@ -9,6 +12,8 @@ import { ErrorState } from '@/src/components/ui/ErrorState';
 import { colors, spacing, typography } from '@/src/constants';
 import { api } from '@/src/lib/api';
 import { extractArray, extractRecord, formatDate, formatValue, getString, PartnerLoadingScreen, type PartnerRecord } from '@/src/features/partner/screens';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export default function SupplierPayoutsScreen() {
   const query = useQuery<unknown>({

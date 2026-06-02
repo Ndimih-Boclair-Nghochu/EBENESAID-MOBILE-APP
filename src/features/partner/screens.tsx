@@ -1,20 +1,26 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
+import { keepPreviousData,
+  useMutation,
+  useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
-import { Tabs, router } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Tabs,
+  router } from 'expo-router';
+import { useEffect,
+  useMemo,
+  useRef,
+  useState } from 'react';
 import {
   Alert,
   Pressable,
   RefreshControl,
   StyleSheet,
   Switch,
-  Text,
-  TextInput,
   View
 } from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ActionList, type ActionListItem } from '@/src/components/partner/ActionList';
@@ -31,6 +37,8 @@ import { toast } from '@/src/components/ui/Toast';
 import { colors, radius, spacing, typography } from '@/src/constants';
 import { useAuth } from '@/src/hooks/useAuth';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export type PartnerRecord = Record<string, unknown>;
 

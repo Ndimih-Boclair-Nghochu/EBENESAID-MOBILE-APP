@@ -1,20 +1,22 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
 import {
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
   View,
   type StyleProp,
   type ViewStyle
 } from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 
 import { Card } from '@/src/components/ui/Card';
 import { SkeletonLoader } from '@/src/components/ui/SkeletonLoader';
 import { colors, radius, spacing, typography } from '@/src/constants';
 
 import { clampPercent } from './utils';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 

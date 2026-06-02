@@ -1,7 +1,12 @@
-import { Image } from 'expo-image';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  Image } from 'expo-image';
+import { StyleSheet,
+  View
+} from 'react-native';
 
 import { colors, radius } from '@/src/constants';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 interface AvatarProps {
   firstName?: string;

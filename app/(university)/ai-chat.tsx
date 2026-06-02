@@ -1,13 +1,24 @@
-import { Ionicons } from '@expo/vector-icons';
-import { FlashList, type FlashListRef } from '@shopify/flash-list';
+import {
+  Ionicons } from '@expo/vector-icons';
+import { FlashList,
+  type FlashListRef } from '@shopify/flash-list';
 import { useMutation } from '@tanstack/react-query';
-import { useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useRef,
+  useState } from 'react';
+import { KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View
+} from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
 import { colors, radius, spacing, typography } from '@/src/constants';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 

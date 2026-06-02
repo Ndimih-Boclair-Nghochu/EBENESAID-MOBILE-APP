@@ -1,9 +1,17 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
+import { keepPreviousData,
+  useMutation,
+  useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable,
+  RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
+import { TextInput } from '@/src/components/ui/TranslatedTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
@@ -15,6 +23,8 @@ import { toast } from '@/src/components/ui/Toast';
 import { colors, radius, spacing, typography } from '@/src/constants';
 import { extractArray, getRecordId, getString, PartnerLoadingScreen, type PartnerRecord } from '@/src/features/partner/screens';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 const contentRoutes = [
   { title: 'AI Knowledge', route: '/(admin)/ai-knowledge', icon: 'sparkles-outline' },

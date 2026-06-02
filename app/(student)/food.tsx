@@ -1,9 +1,17 @@
 import BottomSheet from '@gorhom/bottom-sheet';
-import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
+import {
+  FlashList } from '@shopify/flash-list';
+import { keepPreviousData,
+  useMutation,
+  useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
-import { useMemo, useRef, useState } from 'react';
-import { RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { useMemo,
+  useRef,
+  useState } from 'react';
+import { RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Badge } from '@/src/components/ui/Badge';
@@ -23,6 +31,8 @@ import {
 import type { FoodMenuItem, FoodOrder, FoodResponse } from '@/src/features/student/types';
 import { formatCurrency, statusTone, studentQueryTimes } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type Fulfillment = 'delivery' | 'pickup';
 type Category = 'All' | 'Breakfast' | 'Lunch' | 'Dinner' | 'Snacks';

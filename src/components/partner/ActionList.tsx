@@ -1,6 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable,
+  StyleSheet,
+  View
+} from 'react-native';
 
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
@@ -8,6 +12,8 @@ import { EmptyState } from '@/src/components/ui/EmptyState';
 import { colors, spacing, typography } from '@/src/constants';
 
 import { StatusBadge, type StatusBadgeTone } from './StatusBadge';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export interface ActionListItem {
   id: string | number;

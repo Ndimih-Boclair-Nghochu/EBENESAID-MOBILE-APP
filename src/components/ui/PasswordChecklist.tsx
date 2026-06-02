@@ -1,8 +1,13 @@
-import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  Ionicons } from '@expo/vector-icons';
+import { StyleSheet,
+  View
+} from 'react-native';
 
 import { colors, spacing, typography } from '@/src/constants';
 import { getPasswordRules } from '@/src/lib/password';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 interface PasswordChecklistProps {
   password: string;

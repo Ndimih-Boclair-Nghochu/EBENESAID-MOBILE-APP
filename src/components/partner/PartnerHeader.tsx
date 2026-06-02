@@ -1,8 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Avatar } from '@/src/components/ui/Avatar';
 import { colors, spacing, typography } from '@/src/constants';
 import { useAuthStore } from '@/src/stores/authStore';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 interface PartnerHeaderProps {
   portalName: string;

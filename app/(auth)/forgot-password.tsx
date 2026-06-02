@@ -1,11 +1,11 @@
-import { router } from 'expo-router';
+import {
+  router } from 'expo-router';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +16,8 @@ import { Input } from '@/src/components/ui/Input';
 import { toast } from '@/src/components/ui/Toast';
 import { colors, spacing, typography } from '@/src/constants';
 import { useAuth } from '@/src/hooks/useAuth';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export default function ForgotPasswordScreen() {
   const { forgotPassword } = useAuth();

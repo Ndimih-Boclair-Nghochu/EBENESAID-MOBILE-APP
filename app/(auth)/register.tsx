@@ -1,12 +1,13 @@
-import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import {
+  router } from 'expo-router';
+import { useMemo,
+  useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +23,8 @@ import { COUNTRIES, UNIVERSITIES } from '@/src/constants/registerOptions';
 import { getApiMessage, getHttpStatus, useAuth } from '@/src/hooks/useAuth';
 import { isPasswordStrong } from '@/src/lib/password';
 import type { RegisterPayload } from '@/src/types';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 type AccountType = RegisterPayload['accountType'];
 

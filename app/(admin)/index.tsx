@@ -1,6 +1,11 @@
-import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { RefreshControl, StyleSheet, Text, View } from 'react-native';
+import {
+  FlashList } from '@shopify/flash-list';
+import { keepPreviousData,
+  useQuery } from '@tanstack/react-query';
+import { RefreshControl,
+  StyleSheet,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { MetricCard } from '@/src/components/partner/MetricCard';
@@ -20,6 +25,8 @@ import {
   type PartnerRecord
 } from '@/src/features/partner/screens';
 import { api } from '@/src/lib/api';
+
+import { Text } from '@/src/components/ui/TranslatedText';
 
 export default function AdminDashboardScreen() {
   const query = useQuery<unknown>({
