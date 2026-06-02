@@ -141,14 +141,14 @@ function DashboardHeader({ overview }: { overview: StudentOverview }) {
           onPress={() => router.push('/(student)/arrival')}
         />
         <QuickAction
+          icon="restaurant-outline"
+          label="Food"
+          onPress={() => router.push('/(student)/food')}
+        />
+        <QuickAction
           icon="school-outline"
           label="Programs"
           onPress={() => router.push('/(student)/programs')}
-        />
-        <QuickAction
-          icon="people-outline"
-          label="Community"
-          onPress={() => router.push('/(student)/community')}
         />
       </View>
 
