@@ -16,20 +16,23 @@ type NotificationData = {
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: false,
     shouldSetBadge: true
   })
 });
 
 export async function requestPushNotificationsIfNeeded(): Promise<string | null> {
-  const alreadyRequested = storage.getBoolean(NOTIFICATION_PERMISSION_KEY);
+  const alreadyRequested = await storage.getBoolean(NOTIFICATION_PERMISSION_KEY);
+  const savedToken = await storage.getString(PUSH_TOKEN_KEY);
 
-  if (alreadyRequested && storage.getString(PUSH_TOKEN_KEY)) {
-    return storage.getString(PUSH_TOKEN_KEY) ?? null;
+  if (alreadyRequested && savedToken) {
+    return savedToken;
   }
 
   const permissions = await Notifications.requestPermissionsAsync();
-  storage.set(NOTIFICATION_PERMISSION_KEY, true);
+  await storage.set(NOTIFICATION_PERMISSION_KEY, true);
 
   if (!permissions.granted) {
     return null;
@@ -37,7 +40,7 @@ export async function requestPushNotificationsIfNeeded(): Promise<string | null>
 
   const tokenResponse = await Notifications.getExpoPushTokenAsync();
   const token = tokenResponse.data;
-  storage.set(PUSH_TOKEN_KEY, token);
+  await storage.set(PUSH_TOKEN_KEY, token);
 
   try {
     await api.patch('/api/student/profile', {

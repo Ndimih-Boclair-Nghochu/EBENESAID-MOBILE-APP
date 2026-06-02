@@ -70,7 +70,6 @@ export default function StudentDashboardScreen() {
       <FlashList<Activity>
         data={overview.recentActivity}
         keyExtractor={(item, index) => `${item.type}-${item.createdAt}-${index}`}
-        estimatedItemSize={72}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

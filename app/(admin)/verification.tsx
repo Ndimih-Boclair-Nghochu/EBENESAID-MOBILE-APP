@@ -47,7 +47,6 @@ export default function AdminVerificationScreen() {
       <FlashList<PartnerRecord>
         data={records}
         keyExtractor={(item) => `${getRecordId(item)}`}
-        estimatedItemSize={144}
         refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} tintColor={colors.secondary} colors={[colors.secondary]} />}
         ListHeaderComponent={<View style={styles.content}><PartnerHeader portalName="Verification Queue" subtitle="Approve or reject partner verification." /></View>}
         ListEmptyComponent={<EmptyState icon="shield-checkmark-outline" title="No pending verifications" />}

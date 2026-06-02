@@ -25,8 +25,8 @@ function createQueueId(): string {
   });
 }
 
-function readQueue(): QueuedAction[] {
-  const raw = storage.getString(OFFLINE_QUEUE_KEY);
+async function readQueue(): Promise<QueuedAction[]> {
+  const raw = await storage.getString(OFFLINE_QUEUE_KEY);
 
   if (!raw) {
     return [];
@@ -40,8 +40,8 @@ function readQueue(): QueuedAction[] {
   }
 }
 
-function writeQueue(queue: QueuedAction[]): void {
-  storage.set(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+async function writeQueue(queue: QueuedAction[]): Promise<void> {
+  await storage.set(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
 }
 
 function isQueuedAction(value: unknown): value is QueuedAction {
@@ -60,23 +60,24 @@ function isQueuedAction(value: unknown): value is QueuedAction {
   );
 }
 
-export function enqueueAction(action: QueueableAction): void {
-  const queue = readQueue();
+export async function enqueueAction(action: QueueableAction): Promise<void> {
+  const queue = await readQueue();
   queue.push({
     ...action,
     id: createQueueId(),
     queuedAt: Date.now(),
     retries: 0
   });
-  writeQueue(queue);
+  await writeQueue(queue);
 }
 
-export function getQueueLength(): number {
-  return readQueue().length;
+export async function getQueueLength(): Promise<number> {
+  const queue = await readQueue();
+  return queue.length;
 }
 
 export async function flushQueue(): Promise<void> {
-  const queue = readQueue();
+  const queue = await readQueue();
 
   if (queue.length === 0) {
     return;
@@ -103,7 +104,7 @@ export async function flushQueue(): Promise<void> {
     }
   }
 
-  writeQueue(remaining);
+  await writeQueue(remaining);
 }
 
 export async function requestOrQueue<T>(
@@ -114,7 +115,7 @@ export async function requestOrQueue<T>(
   const isOffline = state.isConnected === false || state.isInternetReachable === false;
 
   if (isOffline) {
-    enqueueAction(action);
+    await enqueueAction(action);
     toast.info('Action saved. It will sync when you are online.');
     return { queued: true };
   }

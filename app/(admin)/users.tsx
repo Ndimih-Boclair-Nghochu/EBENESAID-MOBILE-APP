@@ -92,7 +92,6 @@ export default function AdminUsersScreen() {
       <FlashList<PartnerRecord>
         data={users}
         keyExtractor={(item) => `${getRecordId(item)}`}
-        estimatedItemSize={104}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

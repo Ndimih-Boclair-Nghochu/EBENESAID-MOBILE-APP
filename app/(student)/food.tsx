@@ -122,7 +122,6 @@ export default function FoodScreen() {
         data={menu}
         numColumns={2}
         keyExtractor={(item) => `${item.id}`}
-        estimatedItemSize={260}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}
@@ -144,7 +143,6 @@ export default function FoodScreen() {
                   horizontal
                   data={query.data.orders}
                   keyExtractor={(item) => `${item.id}`}
-                  estimatedItemSize={220}
                   showsHorizontalScrollIndicator={false}
                   renderItem={({ item }) => (
                     <ActiveOrderCard

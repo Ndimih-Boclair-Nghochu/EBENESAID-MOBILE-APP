@@ -63,7 +63,6 @@ export default function AdminContentScreen() {
       <FlashList<PartnerRecord>
         data={items}
         keyExtractor={(item) => `${getRecordId(item)}`}
-        estimatedItemSize={180}
         refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} tintColor={colors.secondary} colors={[colors.secondary]} />}
         ListHeaderComponent={
           <View style={styles.content}>

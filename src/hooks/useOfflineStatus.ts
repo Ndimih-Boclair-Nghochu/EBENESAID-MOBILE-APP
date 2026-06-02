@@ -14,14 +14,14 @@ export function useOfflineStatus(): boolean {
       setIsOffline(offline);
 
       if (previousOfflineRef.current && !offline) {
-        const queueLength = getQueueLength();
-
-        if (queueLength > 0) {
-          toast.info(`Syncing ${queueLength} pending actions...`);
-          void flushQueue().then(() => {
-            toast.success('Sync complete');
-          });
-        }
+        void getQueueLength().then((queueLength) => {
+          if (queueLength > 0) {
+            toast.info(`Syncing ${queueLength} pending actions...`);
+            void flushQueue().then(() => {
+              toast.success('Sync complete');
+            });
+          }
+        });
       }
 
       previousOfflineRef.current = offline;

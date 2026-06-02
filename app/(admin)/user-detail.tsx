@@ -70,7 +70,6 @@ export default function AdminUserDetailScreen() {
       <FlashList<{ key: string; value: string }>
         data={rows}
         keyExtractor={(item) => item.key}
-        estimatedItemSize={64}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

@@ -51,7 +51,6 @@ export default function AdminDashboardScreen() {
       <FlashList<PartnerRecord>
         data={auditEvents}
         keyExtractor={(item, index) => `${getString(item, 'action', 'audit')}-${index}`}
-        estimatedItemSize={88}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

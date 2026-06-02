@@ -1,4 +1,4 @@
-import { StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, Text, type StyleProp, type TextStyle } from 'react-native';
 
 import { colors, radius } from '@/src/constants';
 
@@ -9,7 +9,7 @@ interface BadgeProps {
   label: string;
   tone?: BadgeTone;
   size?: BadgeSize;
-  style?: StyleProp<ViewStyle>;
+  style?: StyleProp<TextStyle>;
 }
 
 const toneStyles: Record<BadgeTone, { backgroundColor: string; color: string }> = {

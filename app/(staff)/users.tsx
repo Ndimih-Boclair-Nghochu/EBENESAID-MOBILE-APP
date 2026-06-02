@@ -50,7 +50,6 @@ export default function StaffUsersScreen() {
       <FlashList<PartnerRecord>
         data={users}
         keyExtractor={(item) => `${item.id ?? item.email}`}
-        estimatedItemSize={96}
         refreshControl={
           <RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} tintColor={colors.secondary} colors={[colors.secondary]} />
         }

@@ -130,7 +130,6 @@ export default function ArrivalScreen() {
       <FlashList<TransportProvider>
         data={query.data.directory}
         keyExtractor={(item) => `${item.id}`}
-        estimatedItemSize={128}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

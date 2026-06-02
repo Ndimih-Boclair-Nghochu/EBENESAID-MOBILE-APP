@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, type FlashListRef } from '@shopify/flash-list';
 import { useMutation } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -12,7 +12,7 @@ import { api } from '@/src/lib/api';
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
 export default function UniversityAIChatScreen() {
-  const listRef = useRef<FlashList<ChatMessage>>(null);
+  const listRef = useRef<FlashListRef<ChatMessage>>(null);
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState('');
 
@@ -56,7 +56,6 @@ export default function UniversityAIChatScreen() {
               ref={listRef}
               data={history}
               keyExtractor={(item, index) => `${item.role}-${index}`}
-              estimatedItemSize={88}
               renderItem={({ item }) => <Bubble message={item} />}
             />
           </View>

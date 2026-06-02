@@ -39,7 +39,6 @@ export function ActionList({
     <FlashList<ActionListItem>
       data={items}
       keyExtractor={(item) => `${item.id}`}
-      estimatedItemSize={112}
       ListEmptyComponent={<EmptyState icon="file-tray-outline" title={emptyTitle} subtitle={emptySubtitle} />}
       renderItem={({ item }) => (
         <Pressable

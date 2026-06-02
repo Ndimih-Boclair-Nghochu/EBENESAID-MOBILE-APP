@@ -42,7 +42,6 @@ export default function InvestorSummaryScreen() {
       <FlashList<PartnerRecord>
         data={growth}
         keyExtractor={(item, index) => `${getString(item, 'label', 'growth')}-${index}`}
-        estimatedItemSize={92}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

@@ -319,7 +319,6 @@ export function SummaryScreen({
       <FlashList<PartnerRecord>
         data={activity}
         keyExtractor={(item, index) => `${getRecordId(item)}-${index}`}
-        estimatedItemSize={88}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}
@@ -578,7 +577,6 @@ export function CrudListScreen({
         key={numColumns}
         numColumns={numColumns}
         keyExtractor={(item) => `${getRecordId(item)}`}
-        estimatedItemSize={numColumns > 1 ? 240 : 184}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}
@@ -628,7 +626,6 @@ export function CrudListScreen({
           <FlashList<FieldConfig>
             data={fields}
             keyExtractor={(item) => item.key}
-            estimatedItemSize={84}
             renderItem={({ item }) => (
               <PartnerField
                 field={item}
@@ -697,7 +694,6 @@ export function ProfileFormScreen({
           <FlashList<FieldConfig>
             data={fields}
             keyExtractor={(item) => item.key}
-            estimatedItemSize={84}
             renderItem={({ item }) => (
               <PartnerField
                 field={item}

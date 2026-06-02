@@ -66,7 +66,6 @@ export default function AdminSettingsScreen() {
       <FlashList<SettingsItem>
         data={rows}
         keyExtractor={(item) => `${item.section}-${getRecordId(item)}`}
-        estimatedItemSize={92}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

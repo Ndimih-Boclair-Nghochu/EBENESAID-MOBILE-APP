@@ -103,7 +103,6 @@ export default function StudentProfileScreen() {
       <FlashList<ProfileRow>
         data={rows}
         keyExtractor={(item) => item.id}
-        estimatedItemSize={84}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

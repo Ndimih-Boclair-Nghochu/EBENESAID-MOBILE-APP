@@ -1,68 +1,114 @@
-import CookieManager from '@react-native-cookies/cookies';
-import { MMKV } from 'react-native-mmkv';
-
-import { API_URL } from './config';
-
-export const storage = new MMKV({
-  id: 'ebenesaid-storage'
-});
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const AUTH_STORAGE_KEY = 'ebenesaid.auth';
 export const USER_PROFILE_STORAGE_KEY = 'ebenesaid.userProfile';
 export const QUERY_CACHE_STORAGE_KEY = 'ebenesaid.queryCache';
 export const SESSION_COOKIE_NAME = 'eb_session';
+const SESSION_COOKIE_STORAGE_KEY = `${SESSION_COOKIE_NAME}.value`;
 
 export const zustandStorage = {
-  getItem: (name: string) => storage.getString(name) ?? null,
-  setItem: (name: string, value: string) => storage.set(name, value),
-  removeItem: (name: string) => storage.delete(name)
+  getItem: (name: string) => AsyncStorage.getItem(name),
+  setItem: (name: string, value: string) => AsyncStorage.setItem(name, value),
+  removeItem: (name: string) => AsyncStorage.removeItem(name)
 };
 
 export const queryStorage = {
-  getItem: async (name: string) => storage.getString(name) ?? null,
-  setItem: async (name: string, value: string) => {
-    storage.set(name, value);
+  getItem: (name: string) => AsyncStorage.getItem(name),
+  setItem: (name: string, value: string) => AsyncStorage.setItem(name, value),
+  removeItem: (name: string) => AsyncStorage.removeItem(name)
+};
+
+export const storage = {
+  getString: (name: string) => AsyncStorage.getItem(name),
+  getBoolean: async (name: string) => {
+    const value = await AsyncStorage.getItem(name);
+
+    if (value === null) {
+      return null;
+    }
+
+    return value === 'true';
   },
-  removeItem: async (name: string) => {
-    storage.delete(name);
-  }
+  set: (name: string, value: string | number | boolean) =>
+    AsyncStorage.setItem(name, String(value)),
+  delete: (name: string) => AsyncStorage.removeItem(name)
 };
 
 export async function getSessionCookieHeader(): Promise<string | undefined> {
-  const cookies = await CookieManager.get(API_URL);
-  const sessionCookie = cookies[SESSION_COOKIE_NAME];
+  const sessionCookie = await AsyncStorage.getItem(SESSION_COOKIE_STORAGE_KEY);
 
-  if (!sessionCookie?.value) {
+  if (!sessionCookie) {
     return undefined;
   }
 
-  return `${SESSION_COOKIE_NAME}=${sessionCookie.value}`;
+  return `${SESSION_COOKIE_NAME}=${sessionCookie}`;
+}
+
+function getSetCookieHeaders(setCookieHeader: unknown): string[] {
+  if (Array.isArray(setCookieHeader)) {
+    return setCookieHeader.filter((header): header is string => typeof header === 'string');
+  }
+
+  return typeof setCookieHeader === 'string' ? [setCookieHeader] : [];
+}
+
+function parseSessionCookie(header: string): string | null {
+  const parts = header.split(';');
+  const cookiePart = parts[0];
+
+  if (!cookiePart) {
+    return null;
+  }
+
+  const attributes = parts.slice(1);
+  const separatorIndex = cookiePart.indexOf('=');
+
+  if (separatorIndex === -1) {
+    return null;
+  }
+
+  const cookieName = cookiePart.slice(0, separatorIndex).trim();
+
+  if (cookieName !== SESSION_COOKIE_NAME) {
+    return null;
+  }
+
+  const isCleared = attributes.some((attribute) => {
+    const normalized = attribute.trim().toLowerCase();
+    return normalized === 'max-age=0' || normalized === 'expires=thu, 01 jan 1970 00:00:00 gmt';
+  });
+
+  if (isCleared) {
+    return '';
+  }
+
+  return cookiePart.slice(separatorIndex + 1).trim();
 }
 
 export async function persistSetCookieHeader(setCookieHeader: unknown): Promise<void> {
-  if (!setCookieHeader) {
-    return;
+  const headers = getSetCookieHeaders(setCookieHeader);
+
+  for (const header of headers) {
+    const value = parseSessionCookie(header);
+
+    if (value === null) {
+      continue;
+    }
+
+    if (!value) {
+      await AsyncStorage.removeItem(SESSION_COOKIE_STORAGE_KEY);
+      continue;
+    }
+
+    await AsyncStorage.setItem(SESSION_COOKIE_STORAGE_KEY, value);
   }
-
-  const headers = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
-
-  await Promise.all(
-    headers
-      .filter((header): header is string => typeof header === 'string' && header.length > 0)
-      .map((header) => CookieManager.setFromResponse(API_URL, header))
-  );
 }
 
 export async function clearSessionCookies(): Promise<void> {
-  await Promise.all([
-    CookieManager.clearByName(API_URL, SESSION_COOKIE_NAME).catch(() => false),
-    CookieManager.clearByName(API_URL, SESSION_COOKIE_NAME, true).catch(() => false)
-  ]);
+  await AsyncStorage.removeItem(SESSION_COOKIE_STORAGE_KEY);
 }
 
-export function clearMMKVCache(): void {
-  storage.delete(AUTH_STORAGE_KEY);
-  storage.delete(USER_PROFILE_STORAGE_KEY);
-  storage.delete(QUERY_CACHE_STORAGE_KEY);
+export async function clearStorageCache(): Promise<void> {
+  await AsyncStorage.multiRemove([AUTH_STORAGE_KEY, USER_PROFILE_STORAGE_KEY, QUERY_CACHE_STORAGE_KEY]);
 }
 

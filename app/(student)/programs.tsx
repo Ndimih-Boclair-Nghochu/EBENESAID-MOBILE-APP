@@ -127,7 +127,6 @@ export default function ProgramsScreen() {
       <FlashList<ProgramsListItem>
         data={data as ProgramsListItem[]}
         keyExtractor={(item) => ('programId' in item ? `${item.programId}` : `${item.id}`)}
-        estimatedItemSize={196}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

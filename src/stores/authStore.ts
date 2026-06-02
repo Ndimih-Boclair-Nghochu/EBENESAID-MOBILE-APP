@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { clearQueryCache } from '@/src/lib/queryClient';
 import {
   AUTH_STORAGE_KEY,
-  clearMMKVCache,
+  clearStorageCache,
   clearSessionCookies,
   zustandStorage
 } from '@/src/lib/storage';
@@ -43,7 +43,7 @@ export const useAuthStore = create<AuthState>()(
         useUserStore.getState().clearProfile();
         await clearSessionCookies();
         await clearQueryCache();
-        clearMMKVCache();
+        await clearStorageCache();
       }
     }),
     {

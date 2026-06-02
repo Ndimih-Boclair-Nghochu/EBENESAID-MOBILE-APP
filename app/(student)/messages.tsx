@@ -160,7 +160,6 @@ export default function MessagesScreen() {
       <FlashList<ConversationSummary>
         data={filteredConversations}
         keyExtractor={(item) => `${item.id}`}
-        estimatedItemSize={86}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

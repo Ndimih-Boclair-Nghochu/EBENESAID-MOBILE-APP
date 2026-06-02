@@ -145,7 +145,6 @@ export default function CommunityScreen() {
         keyExtractor={(item) =>
           'userId' in item ? `buddy-${item.userId}` : `${tab}-${item.id}`
         }
-        estimatedItemSize={tab === 'buddies' ? 220 : 156}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

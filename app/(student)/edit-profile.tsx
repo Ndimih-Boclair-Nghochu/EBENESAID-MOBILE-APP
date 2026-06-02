@@ -158,7 +158,6 @@ export default function EditProfileScreen() {
       <FlashList
         data={fields}
         keyExtractor={(item) => item.key}
-        estimatedItemSize={88}
         keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl

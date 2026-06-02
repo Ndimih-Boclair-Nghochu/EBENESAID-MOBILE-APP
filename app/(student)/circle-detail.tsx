@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, type FlashListRef } from '@shopify/flash-list';
 import { useIsFocused } from '@react-navigation/native';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -38,7 +38,7 @@ async function fetchCommunity() {
 
 export default function CircleDetailScreen() {
   const isFocused = useIsFocused();
-  const listRef = useRef<FlashList<CommunityCircleMessage>>(null);
+  const listRef = useRef<FlashListRef<CommunityCircleMessage>>(null);
   const queryClient = useQueryClient();
   const params = useLocalSearchParams<{
     circleId?: string | string[];
@@ -70,7 +70,7 @@ export default function CircleDetailScreen() {
   const displayName = circle?.name ?? fallbackName ?? 'Circle';
   const memberCount = circle?.memberCount ?? Number(fallbackMemberCount) ?? 0;
   const messages = useMemo(
-    () => sortMessagesNewestFirst<CommunityCircleMessage>(circle?.messages ?? []),
+    () => [...sortMessagesNewestFirst<CommunityCircleMessage>(circle?.messages ?? [])].reverse(),
     [circle?.messages]
   );
   const currentSenderName = user ? `${user.firstName} ${user.lastName}` : 'You';
@@ -113,7 +113,7 @@ export default function CircleDetailScreen() {
 
       setContent('');
       requestAnimationFrame(() => {
-        listRef.current?.scrollToOffset({ offset: 0, animated: true });
+        listRef.current?.scrollToEnd({ animated: true });
       });
 
       return { previous };
@@ -173,9 +173,11 @@ export default function CircleDetailScreen() {
         <FlashList<CommunityCircleMessage>
           ref={listRef}
           data={messages}
-          inverted
           keyExtractor={(item) => `${item.id}`}
-          estimatedItemSize={78}
+          maintainVisibleContentPosition={{
+            autoscrollToBottomThreshold: 0.2,
+            startRenderingFromBottom: true
+          }}
           ListEmptyComponent={
             query.isLoading ? null : (
               <EmptyState

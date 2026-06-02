@@ -189,7 +189,6 @@ export default function DocumentsScreen() {
       <FlashList<StudentDocument>
         data={query.data.documents}
         keyExtractor={(item) => `${item.id}`}
-        estimatedItemSize={104}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

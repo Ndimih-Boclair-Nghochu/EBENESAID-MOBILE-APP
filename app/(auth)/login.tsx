@@ -34,20 +34,31 @@ export default function LoginScreen() {
   const canUseBiometrics = biometrics.isAvailable && Boolean(lastEmail);
 
   useEffect(() => {
-    const savedEmail = storage.getString(LAST_EMAIL_KEY) ?? null;
-    setLastEmail(savedEmail);
+    let isMounted = true;
 
-    if (savedEmail && !email) {
-      setEmail(savedEmail);
-    }
-  }, [email]);
+    void storage.getString(LAST_EMAIL_KEY).then((savedEmail) => {
+      if (!isMounted) {
+        return;
+      }
+
+      setLastEmail(savedEmail);
+
+      if (savedEmail) {
+        setEmail(savedEmail);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleLogin = async () => {
     setError(undefined);
 
     try {
       await login(email.trim(), password);
-      storage.set(LAST_EMAIL_KEY, email.trim());
+      await storage.set(LAST_EMAIL_KEY, email.trim());
       setLastEmail(email.trim());
     } catch (loginError) {
       const status = getHttpStatus(loginError);

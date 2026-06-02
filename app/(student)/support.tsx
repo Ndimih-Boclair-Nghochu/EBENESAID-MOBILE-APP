@@ -97,7 +97,6 @@ export default function SupportScreen() {
         <FlashList<SupportMessage>
           data={query.data.messages}
           keyExtractor={(item) => `${item.id}`}
-          estimatedItemSize={92}
           refreshControl={
             <RefreshControl
               refreshing={query.isRefetching}

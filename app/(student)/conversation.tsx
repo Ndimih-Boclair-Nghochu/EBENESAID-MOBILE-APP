@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, type FlashListRef } from '@shopify/flash-list';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -39,7 +39,7 @@ async function fetchConversation(conversationId: number) {
 }
 
 export default function ConversationScreen() {
-  const listRef = useRef<FlashList<ConversationMessage>>(null);
+  const listRef = useRef<FlashListRef<ConversationMessage>>(null);
   const queryClient = useQueryClient();
   const user = useAuthStore((store) => store.user);
   const params = useLocalSearchParams<{ conversationId?: string | string[] }>();
@@ -110,7 +110,7 @@ export default function ConversationScreen() {
 
       setContent('');
       requestAnimationFrame(() => {
-        listRef.current?.scrollToOffset({ offset: 0, animated: true });
+        listRef.current?.scrollToEnd({ animated: true });
       });
 
       return { previous };
@@ -126,7 +126,7 @@ export default function ConversationScreen() {
   });
 
   const messages = useMemo(
-    () => sortMessagesNewestFirst<ConversationMessage>(query.data?.messages ?? []),
+    () => [...sortMessagesNewestFirst<ConversationMessage>(query.data?.messages ?? [])].reverse(),
     [query.data?.messages]
   );
   const otherParticipant = query.data
@@ -135,7 +135,7 @@ export default function ConversationScreen() {
 
   useEffect(() => {
     if (messages.length > 0) {
-      listRef.current?.scrollToOffset({ offset: 0, animated: true });
+      listRef.current?.scrollToEnd({ animated: true });
     }
   }, [messages.length]);
 
@@ -197,9 +197,11 @@ export default function ConversationScreen() {
         <FlashList<ConversationMessage>
           ref={listRef}
           data={messages}
-          inverted
           keyExtractor={(item) => `${item.id}`}
-          estimatedItemSize={82}
+          maintainVisibleContentPosition={{
+            autoscrollToBottomThreshold: 0.2,
+            startRenderingFromBottom: true
+          }}
           ListEmptyComponent={
             query.isLoading ? null : (
               <EmptyState

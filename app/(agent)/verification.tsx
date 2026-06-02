@@ -66,7 +66,6 @@ export default function AgentVerificationScreen() {
       <FlashList<PartnerRecord>
         data={documents}
         keyExtractor={(item, index) => `${getString(item, 'name', 'document')}-${index}`}
-        estimatedItemSize={92}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

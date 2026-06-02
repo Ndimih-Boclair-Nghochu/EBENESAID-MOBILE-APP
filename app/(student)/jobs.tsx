@@ -157,7 +157,6 @@ export default function StudentJobsScreen() {
       <FlashList<JobsListItem>
         data={data as JobsListItem[]}
         keyExtractor={(item) => ('jobId' in item ? `${item.jobId}` : `${item.id}`)}
-        estimatedItemSize={196}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

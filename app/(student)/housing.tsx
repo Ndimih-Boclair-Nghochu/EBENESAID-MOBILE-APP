@@ -220,7 +220,6 @@ export default function StudentHousingScreen() {
       <FlashList<StudentHousingListingView>
         data={listings}
         keyExtractor={(item) => `${item.id}`}
-        estimatedItemSize={340}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}
