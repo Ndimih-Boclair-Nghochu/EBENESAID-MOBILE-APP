@@ -1,8 +1,15 @@
-import { Stack } from 'expo-router';
-
-import { colors } from '@/src/constants';
+import { PartnerTabsLayout } from '@/src/features/partner/screens';
 
 export default function JobPartnerLayout() {
-  return <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />;
+  return (
+    <PartnerTabsLayout
+      tabs={[
+        { name: 'index', title: 'Summary', activeIcon: 'stats-chart', inactiveIcon: 'stats-chart-outline' },
+        { name: 'jobs', title: 'Jobs', activeIcon: 'briefcase', inactiveIcon: 'briefcase-outline' },
+        { name: 'applicants', title: 'Applicants', activeIcon: 'people', inactiveIcon: 'people-outline' },
+        { name: 'profile', title: 'Profile', activeIcon: 'person', inactiveIcon: 'person-outline' }
+      ]}
+    />
+  );
 }
 

@@ -1,8 +1,16 @@
-import { Stack } from 'expo-router';
-
-import { colors } from '@/src/constants';
+import { PartnerTabsLayout } from '@/src/features/partner/screens';
 
 export default function UniversityLayout() {
-  return <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />;
+  return (
+    <PartnerTabsLayout
+      tabs={[
+        { name: 'index', title: 'Summary', activeIcon: 'stats-chart', inactiveIcon: 'stats-chart-outline' },
+        { name: 'programs', title: 'Programs', activeIcon: 'school', inactiveIcon: 'school-outline' },
+        { name: 'applications', title: 'Applications', activeIcon: 'document-text', inactiveIcon: 'document-text-outline' },
+        { name: 'ai-chat', title: 'AI Chat', activeIcon: 'sparkles', inactiveIcon: 'sparkles-outline' },
+        { name: 'profile', title: 'Profile', activeIcon: 'person', inactiveIcon: 'person-outline' }
+      ]}
+    />
+  );
 }
 
