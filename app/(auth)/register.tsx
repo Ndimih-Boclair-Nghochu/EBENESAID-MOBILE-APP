@@ -11,12 +11,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AuthHeader } from '@/src/components/layout/AuthHeader';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { Input } from '@/src/components/ui/Input';
 import { PasswordChecklist } from '@/src/components/ui/PasswordChecklist';
 import { toast } from '@/src/components/ui/Toast';
 import { colors, radius, spacing, typography } from '@/src/constants';
+import { COUNTRIES, UNIVERSITIES } from '@/src/constants/registerOptions';
 import { getApiMessage, getHttpStatus, useAuth } from '@/src/hooks/useAuth';
 import { isPasswordStrong } from '@/src/lib/password';
 import type { RegisterPayload } from '@/src/types';
@@ -36,6 +38,26 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const [isUniversityFocused, setUniversityFocused] = useState(false);
+  const [isCountryFocused, setCountryFocused] = useState(false);
+
+  const universityOptions = useMemo(() => {
+    const query = university.trim().toLowerCase();
+    const options = query
+      ? UNIVERSITIES.filter((option) => option.name.toLowerCase().includes(query))
+      : UNIVERSITIES;
+
+    return options.slice(0, 6);
+  }, [university]);
+
+  const countryOptions = useMemo(() => {
+    const query = countryOfOrigin.trim().toLowerCase();
+    const options = query
+      ? COUNTRIES.filter((country) => country.toLowerCase().includes(query))
+      : COUNTRIES;
+
+    return options.slice(0, 6);
+  }, [countryOfOrigin]);
 
   const passwordError = useMemo(() => {
     if (!password || isPasswordStrong(password)) {
@@ -109,10 +131,10 @@ export default function RegisterScreen() {
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <View style={styles.header}>
-            <Text style={styles.title}>Create account</Text>
-            <Text style={styles.subtitle}>Start with a student or resident profile.</Text>
-          </View>
+          <AuthHeader
+            title="Create account"
+            subtitle="Start with a student or resident profile."
+          />
           <Card style={styles.form}>
             <View style={styles.segmented}>
               <AccountTypeButton
@@ -158,18 +180,68 @@ export default function RegisterScreen() {
             />
             {accountType === 'student' ? (
               <>
-                <Input
-                  label="University"
-                  leftIcon="school-outline"
-                  value={university}
-                  onChangeText={setUniversity}
-                />
-                <Input
-                  label="Country of Origin"
-                  leftIcon="flag-outline"
-                  value={countryOfOrigin}
-                  onChangeText={setCountryOfOrigin}
-                />
+                <View style={styles.lookupField}>
+                  <Input
+                    label="University"
+                    leftIcon="school-outline"
+                    value={university}
+                    onChangeText={(value) => {
+                      setUniversity(value);
+                      setUniversityFocused(true);
+                    }}
+                    onFocus={() => setUniversityFocused(true)}
+                    placeholder="Select or type your university"
+                  />
+                  {isUniversityFocused ? (
+                    <View style={styles.optionList}>
+                      {universityOptions.length > 0 ? (
+                        universityOptions.map((option) => (
+                          <OptionButton
+                            key={option.id}
+                            label={option.name}
+                            onPress={() => {
+                              setUniversity(option.name);
+                              setUniversityFocused(false);
+                            }}
+                          />
+                        ))
+                      ) : (
+                        <Text style={styles.emptyOption}>No matching university.</Text>
+                      )}
+                    </View>
+                  ) : null}
+                </View>
+                <View style={styles.lookupField}>
+                  <Input
+                    label="Country of Origin"
+                    leftIcon="flag-outline"
+                    value={countryOfOrigin}
+                    onChangeText={(value) => {
+                      setCountryOfOrigin(value);
+                      setCountryFocused(true);
+                    }}
+                    onFocus={() => setCountryFocused(true)}
+                    placeholder="Select or type your country"
+                  />
+                  {isCountryFocused ? (
+                    <View style={styles.optionList}>
+                      {countryOptions.length > 0 ? (
+                        countryOptions.map((country) => (
+                          <OptionButton
+                            key={country}
+                            label={country}
+                            onPress={() => {
+                              setCountryOfOrigin(country);
+                              setCountryFocused(false);
+                            }}
+                          />
+                        ))
+                      ) : (
+                        <Text style={styles.emptyOption}>No matching country.</Text>
+                      )}
+                    </View>
+                  ) : null}
+                </View>
               </>
             ) : null}
             <Input
@@ -223,6 +295,19 @@ function AccountTypeButton({ label, selected, onPress }: AccountTypeButtonProps)
   );
 }
 
+interface OptionButtonProps {
+  label: string;
+  onPress: () => void;
+}
+
+function OptionButton({ label, onPress }: OptionButtonProps) {
+  return (
+    <Pressable accessibilityRole="button" onPress={onPress} style={styles.optionButton}>
+      <Text style={styles.optionText}>{label}</Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: colors.background,
@@ -235,19 +320,35 @@ const styles = StyleSheet.create({
     gap: spacing.xl,
     padding: spacing.xl
   },
-  header: {
-    gap: spacing.xs,
-    paddingTop: spacing.xl
-  },
-  title: {
-    ...typography.headingLarge
-  },
-  subtitle: {
-    ...typography.body,
-    color: colors.textSecondary
-  },
   form: {
     gap: spacing.md
+  },
+  lookupField: {
+    gap: spacing.xs
+  },
+  optionList: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    overflow: 'hidden'
+  },
+  optionButton: {
+    borderBottomColor: colors.border,
+    borderBottomWidth: 1,
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm
+  },
+  optionText: {
+    ...typography.body,
+    color: colors.text
+  },
+  emptyOption: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    padding: spacing.md
   },
   segmented: {
     backgroundColor: colors.neutralSoft,

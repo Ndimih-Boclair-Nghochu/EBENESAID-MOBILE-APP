@@ -73,12 +73,13 @@ export function useAuth() {
 
       await persistSessionFromAuthPayload(response.data);
 
-      const sessionUser = await probeSession();
-      router.replace(getPortalRoute(sessionUser.userType));
+      const user = extractUser(response.data);
+      auth.setUser(user);
+      router.replace(getPortalRoute(user.userType));
 
       return {
         ...response.data,
-        user: sessionUser
+        user
       };
     } finally {
       auth.setLoading(false);
@@ -113,15 +114,9 @@ export function useAuth() {
     }
 
     await persistSessionFromAuthPayload(response.data);
-
-    try {
-      const sessionUser = await probeSession();
-      router.replace(getPortalRoute(sessionUser.userType));
-      return sessionUser;
-    } catch {
-      await auth.clearAuth();
-      return null;
-    }
+    auth.setUser(responseUser);
+    router.replace(getPortalRoute(responseUser.userType));
+    return responseUser;
   };
 
   const forgotPassword = (email: string) =>

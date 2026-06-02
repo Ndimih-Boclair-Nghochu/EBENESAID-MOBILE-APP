@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AuthHeader } from '@/src/components/layout/AuthHeader';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { Input } from '@/src/components/ui/Input';
@@ -110,11 +111,7 @@ export default function LoginScreen() {
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <View style={styles.header}>
-            <Text style={styles.brand}>EBENESAID</Text>
-            <Text style={styles.title}>Sign in</Text>
-            <Text style={styles.subtitle}>Access your relocation portal.</Text>
-          </View>
+          <AuthHeader title="Sign in" subtitle="Access your relocation portal." />
           <Card style={styles.form}>
             <Input
               label="Email"
@@ -175,21 +172,6 @@ const styles = StyleSheet.create({
   content: {
     gap: spacing.xl,
     padding: spacing.xl
-  },
-  header: {
-    gap: spacing.xs,
-    paddingTop: spacing.xl
-  },
-  brand: {
-    ...typography.headingSmall,
-    color: colors.secondary
-  },
-  title: {
-    ...typography.headingLarge
-  },
-  subtitle: {
-    ...typography.body,
-    color: colors.textSecondary
   },
   form: {
     gap: spacing.md

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorState } from '@/src/components/ui/ErrorState';
@@ -11,6 +11,8 @@ import { api } from '@/src/lib/api';
 import { getPortalRoute } from '@/src/lib/roleRoutes';
 import { useAuthStore } from '@/src/stores/authStore';
 import type { AuthMeResponse, SafeUser } from '@/src/types';
+
+const brandLogo = require('../assets/ebenesaid-logo.jpeg');
 
 type BootstrapState = 'loading' | 'server-error';
 
@@ -70,6 +72,7 @@ export default function BootstrapScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.loading}>
+        <Image source={brandLogo} style={styles.logo} resizeMode="cover" />
         <Text style={styles.brand}>EBENESAID</Text>
         <LoadingSpinner />
       </View>
@@ -91,6 +94,14 @@ const styles = StyleSheet.create({
   },
   brand: {
     ...typography.headingLarge
+  },
+  logo: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: 52,
+    borderWidth: 1,
+    height: 104,
+    width: 104
   }
 });
 

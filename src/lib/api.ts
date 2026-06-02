@@ -26,6 +26,10 @@ function setCookieHeader(config: InternalAxiosRequestConfig, cookieHeader: strin
   config.headers.Cookie = cookieHeader;
 }
 
+function isAuthSessionCheck(url: unknown): boolean {
+  return typeof url === 'string' && url.includes('/api/auth/me');
+}
+
 api.interceptors.request.use(async (config) => {
   const cookieHeader = await getSessionCookieHeader();
 
@@ -46,7 +50,7 @@ api.interceptors.response.use(
       error.response?.headers?.['set-cookie'] ?? error.response?.headers?.['Set-Cookie']
     );
 
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && isAuthSessionCheck(error.config?.url)) {
       void useAuthStore.getState().clearAuth();
       router.replace('/(auth)/login');
     }
