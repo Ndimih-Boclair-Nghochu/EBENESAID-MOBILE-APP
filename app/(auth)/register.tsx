@@ -71,7 +71,7 @@ export default function RegisterScreen() {
     setSubmitting(true);
 
     try {
-      await register({
+      const registeredUser = await register({
         accountType,
         email: email.trim(),
         password,
@@ -82,6 +82,12 @@ export default function RegisterScreen() {
         university: university.trim() || undefined,
         countryOfOrigin: countryOfOrigin.trim() || undefined
       });
+
+      if (registeredUser) {
+        toast.success('Account created! Welcome to EBENESAID.');
+        return;
+      }
+
       toast.success('Account created! Check your email then sign in.');
       router.replace('/(auth)/login');
     } catch (registerError) {

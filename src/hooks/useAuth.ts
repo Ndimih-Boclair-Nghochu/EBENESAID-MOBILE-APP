@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 
 import { api } from '@/src/lib/api';
 import { getPortalRoute } from '@/src/lib/roleRoutes';
+import { persistSessionFromAuthPayload } from '@/src/lib/storage';
 import { useAuthStore } from '@/src/stores/authStore';
 import type {
   AuthLoginResponse,
@@ -13,11 +14,36 @@ import type {
 } from '@/src/types';
 
 function extractUser(data: AuthMeResponse | { user?: SafeUser } | SafeUser): SafeUser {
-  if ('user' in data && data.user) {
-    return data.user;
+  const user = extractOptionalUser(data);
+
+  if (user) {
+    return user;
   }
 
   return data as SafeUser;
+}
+
+function isSafeUser(value: unknown): value is SafeUser {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'id' in value &&
+    'email' in value &&
+    'userType' in value
+  );
+}
+
+function extractOptionalUser(data: unknown): SafeUser | null {
+  if (isSafeUser(data)) {
+    return data;
+  }
+
+  if (typeof data === 'object' && data !== null && 'user' in data) {
+    const user = (data as { user?: unknown }).user;
+    return isSafeUser(user) ? user : null;
+  }
+
+  return null;
 }
 
 export function getHttpStatus(error: unknown): number | undefined {
@@ -45,9 +71,15 @@ export function useAuth() {
         password
       });
 
-      auth.setUser(response.data.user);
-      router.replace(getPortalRoute(response.data.user.userType));
-      return response.data;
+      await persistSessionFromAuthPayload(response.data);
+
+      const sessionUser = await probeSession();
+      router.replace(getPortalRoute(sessionUser.userType));
+
+      return {
+        ...response.data,
+        user: sessionUser
+      };
     } finally {
       auth.setLoading(false);
     }
@@ -69,7 +101,28 @@ export function useAuth() {
     }
   };
 
-  const register = (payload: RegisterPayload) => api.post('/api/auth/register', payload);
+  const register = async (payload: RegisterPayload): Promise<SafeUser | null> => {
+    const response = await api.post<AuthLoginResponse | AuthMeResponse | SafeUser | { message?: string }>(
+      '/api/auth/register',
+      payload
+    );
+    const responseUser = extractOptionalUser(response.data);
+
+    if (!responseUser) {
+      return null;
+    }
+
+    await persistSessionFromAuthPayload(response.data);
+
+    try {
+      const sessionUser = await probeSession();
+      router.replace(getPortalRoute(sessionUser.userType));
+      return sessionUser;
+    } catch {
+      await auth.clearAuth();
+      return null;
+    }
+  };
 
   const forgotPassword = (email: string) =>
     api.post('/api/auth/forgot-password', {

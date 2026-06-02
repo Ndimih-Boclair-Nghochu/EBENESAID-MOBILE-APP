@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 export const AUTH_STORAGE_KEY = 'ebenesaid.auth';
 export const USER_PROFILE_STORAGE_KEY = 'ebenesaid.userProfile';
@@ -34,8 +35,20 @@ export const storage = {
   delete: (name: string) => AsyncStorage.removeItem(name)
 };
 
+async function getSessionCookieValue(): Promise<string | null> {
+  return SecureStore.getItemAsync(SESSION_COOKIE_STORAGE_KEY);
+}
+
+async function setSessionCookieValue(value: string): Promise<void> {
+  await SecureStore.setItemAsync(SESSION_COOKIE_STORAGE_KEY, value);
+}
+
+async function deleteSessionCookieValue(): Promise<void> {
+  await SecureStore.deleteItemAsync(SESSION_COOKIE_STORAGE_KEY);
+}
+
 export async function getSessionCookieHeader(): Promise<string | undefined> {
-  const sessionCookie = await AsyncStorage.getItem(SESSION_COOKIE_STORAGE_KEY);
+  const sessionCookie = await getSessionCookieValue();
 
   if (!sessionCookie) {
     return undefined;
@@ -44,12 +57,21 @@ export async function getSessionCookieHeader(): Promise<string | undefined> {
   return `${SESSION_COOKIE_NAME}=${sessionCookie}`;
 }
 
+function splitCombinedSetCookieHeader(header: string): string[] {
+  return header
+    .split(/,\s*(?=[A-Za-z0-9_.-]+=)/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
 function getSetCookieHeaders(setCookieHeader: unknown): string[] {
   if (Array.isArray(setCookieHeader)) {
-    return setCookieHeader.filter((header): header is string => typeof header === 'string');
+    return setCookieHeader
+      .filter((header): header is string => typeof header === 'string')
+      .flatMap(splitCombinedSetCookieHeader);
   }
 
-  return typeof setCookieHeader === 'string' ? [setCookieHeader] : [];
+  return typeof setCookieHeader === 'string' ? splitCombinedSetCookieHeader(setCookieHeader) : [];
 }
 
 function parseSessionCookie(header: string): string | null {
@@ -96,16 +118,43 @@ export async function persistSetCookieHeader(setCookieHeader: unknown): Promise<
     }
 
     if (!value) {
-      await AsyncStorage.removeItem(SESSION_COOKIE_STORAGE_KEY);
+      await deleteSessionCookieValue();
       continue;
     }
 
-    await AsyncStorage.setItem(SESSION_COOKIE_STORAGE_KEY, value);
+    await setSessionCookieValue(value);
   }
 }
 
+function getSessionCandidateFromPayload(payload: unknown): unknown {
+  if (typeof payload !== 'object' || payload === null) {
+    return undefined;
+  }
+
+  const record = payload as Record<string, unknown>;
+  return record[SESSION_COOKIE_NAME] ?? record.sessionCookie ?? record.session_cookie;
+}
+
+export async function persistSessionFromAuthPayload(payload: unknown): Promise<void> {
+  const candidate = getSessionCandidateFromPayload(payload);
+
+  if (typeof candidate !== 'string' || candidate.trim().length === 0) {
+    return;
+  }
+
+  const parsedCookieValue = parseSessionCookie(candidate);
+  const value = parsedCookieValue ?? candidate.trim();
+
+  if (!value) {
+    await deleteSessionCookieValue();
+    return;
+  }
+
+  await setSessionCookieValue(value);
+}
+
 export async function clearSessionCookies(): Promise<void> {
-  await AsyncStorage.removeItem(SESSION_COOKIE_STORAGE_KEY);
+  await deleteSessionCookieValue();
 }
 
 export async function clearStorageCache(): Promise<void> {
