@@ -262,7 +262,7 @@ function BookingCard({ booking }: { booking: NonNullable<ArrivalResponse['bookin
     <Card style={styles.bookingCard}>
       <View style={styles.bookingHeader}>
         <Text style={styles.cardTitle}>Booking details</Text>
-        <Badge label={booking.status} tone={statusTone(booking.status)} />
+        <Badge label={booking.pickupStatus ?? booking.status ?? "Pending"} tone={statusTone(booking.pickupStatus ?? booking.status ?? "")} />
       </View>
       <IconLabel icon="navigate-outline" title={`${booking.origin} to ${booking.destination}`} />
       <IconLabel

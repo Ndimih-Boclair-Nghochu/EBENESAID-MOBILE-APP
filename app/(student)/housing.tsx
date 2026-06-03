@@ -36,7 +36,7 @@ import {
   SegmentedTabs
 } from '@/src/features/student/components';
 import type {
-  HousingRequest,
+  StudentHousingRequest,
   HousingResponse,
   StudentHousingListingView
 } from '@/src/features/student/types';
@@ -110,9 +110,7 @@ export default function StudentHousingScreen() {
 
         return {
           ...current,
-          favorites: saved
-            ? Array.from(new Set([...current.favorites, listingId]))
-            : current.favorites.filter((id: number) => id !== listingId),
+          // favorite state is reflected on the listing.saved field - no separate favorites array
           listings: current.listings.map((listing: StudentHousingListingView) =>
             listing.id === listingId ? { ...listing, saved } : listing
           )
@@ -308,7 +306,7 @@ export default function StudentHousingScreen() {
         )}
         ListFooterComponent={
           <RequestsSection
-            requests={query.data.activeRequests}
+            requests={query.data.requests ?? []}
             section={requestSection}
             setSection={setRequestSection}
             onCancel={(requestId) => cancelMutation.mutate(requestId)}
@@ -428,7 +426,7 @@ function RequestsSection({
   onCancel,
   isCancelling
 }: {
-  requests: HousingRequest[];
+  requests: StudentHousingRequest[];
   section: RequestSection;
   setSection: (section: RequestSection) => void;
   onCancel: (requestId: number) => void;

@@ -190,7 +190,7 @@ export default function ProgramsScreen() {
       <BottomSheet ref={sheetRef} index={-1} snapPoints={['44%']} enablePanDownToClose>
         <View style={styles.sheetContent}>
           <View>
-            <Text style={styles.sheetTitle}>{selectedProgram?.programName ?? 'Apply'}</Text>
+            <Text style={styles.sheetTitle}>{selectedProgram?.title ?? 'Apply'}</Text>
             <Text style={styles.sheetSubtitle}>{selectedProgram?.schoolName}</Text>
           </View>
           <TextInput
@@ -235,7 +235,7 @@ function ProgramCard({
       <View style={styles.programHeader}>
         <View style={styles.programText}>
           <Text style={styles.school}>{program.schoolName}</Text>
-          <Text style={styles.programName}>{program.programName}</Text>
+          <Text style={styles.programName}>{program.title}</Text>
         </View>
         <Badge label={program.applicationOpen ? 'Open' : 'Closed'} tone={program.applicationOpen ? 'success' : 'default'} />
       </View>
@@ -248,7 +248,7 @@ function ProgramCard({
         {program.description}
       </Text>
       <Text style={styles.fee}>
-        {formatCurrency(program.tuitionFee, program.currency)} tuition
+        {program.tuitionLabel} tuition
       </Text>
       <Button
         title={applied ? 'Applied' : 'Apply'}

@@ -1,17 +1,8 @@
-import {
-  Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient } from '@tanstack/react-query';
-import { useMemo,
-  useState } from 'react';
-import { Pressable,
-  RefreshControl,
-  StyleSheet,
-  View
-} from 'react-native';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
+import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Badge } from '@/src/components/ui/Badge';
@@ -19,155 +10,100 @@ import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { ErrorState } from '@/src/components/ui/ErrorState';
+import { Text } from '@/src/components/ui/TranslatedText';
 import { toast } from '@/src/components/ui/Toast';
 import { colors, spacing, typography } from '@/src/constants';
 import {
-  FilterChip,
-  IconLabel,
-  PagePadding,
-  ScreenSkeleton,
-  SearchBar,
-  SegmentedTabs
+  FilterChip, PagePadding, ScreenSkeleton, SearchBar, SegmentedTabs,
 } from '@/src/features/student/components';
-import type { JobApplication, JobPost, JobsResponse } from '@/src/features/student/types';
-import {
-  formatDate,
-  normalizeSearch,
-  statusTone,
-  studentQueryTimes
-} from '@/src/features/student/utils';
+import type { JobsResponse, StudentJobBoardItem } from '@/src/features/student/types';
+import { normalizeSearch, statusTone, studentQueryTimes } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
-import { requestOrQueue } from '@/src/lib/offlineQueue';
 
-import { Text } from '@/src/components/ui/TranslatedText';
-
-type JobsTab = 'browse' | 'applications';
-type JobsListItem = JobPost | JobApplication;
-
-const queryKey = ['jobs'] as const;
-const filters = ['Full-time', 'Part-time', 'Internship', 'Remote'];
+type Tab = 'browse' | 'applied';
+const FILTERS = ['All', 'Full-time', 'Part-time', 'Internship', 'Remote'] as const;
+const QK = ['jobs'] as const;
 
 async function fetchJobs() {
-  const response = await api.get<JobsResponse>('/api/jobs');
-  return response.data;
+  const r = await api.get<JobsResponse>('/api/jobs');
+  return r.data;
 }
 
-export default function StudentJobsScreen() {
-  const queryClient = useQueryClient();
-  const [tab, setTab] = useState<JobsTab>('browse');
+export default function JobsScreen() {
+  const qc = useQueryClient();
+  const [tab, setTab] = useState<Tab>('browse');
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
 
   const query = useQuery<JobsResponse>({
-    queryKey,
+    queryKey: QK,
     queryFn: fetchJobs,
     staleTime: studentQueryTimes.jobs.staleTime,
     gcTime: studentQueryTimes.jobs.gcTime,
-    placeholderData: keepPreviousData
+    placeholderData: keepPreviousData,
   });
 
-  const saveMutation = useMutation({
-    mutationFn: ({ jobId, saved }: { jobId: number; saved: boolean }) => {
-      const body = {
-        action: 'save',
-        jobId,
-        saved
-      };
-
-      return requestOrQueue(
-        {
-          endpoint: '/api/jobs',
-          method: 'POST',
-          body
-        },
-        () => api.post('/api/jobs', body)
-      );
-    },
+  const saveMut = useMutation({
+    mutationFn: (v: { jobId: number; saved: boolean }) =>
+      api.post('/api/jobs', { action: 'save', ...v }),
     onMutate: async ({ jobId, saved }) => {
-      await queryClient.cancelQueries({ queryKey });
-      const previous = queryClient.getQueryData<JobsResponse>(queryKey);
-
-      queryClient.setQueryData<JobsResponse>(queryKey, (current: JobsResponse | undefined) => {
-        if (!current) {
-          return current;
-        }
-
-        return {
-          ...current,
-          jobs: current.jobs.map((job: JobPost) => (job.id === jobId ? { ...job, saved } : job))
-        };
-      });
-
-      return { previous };
-    },
-    onError: (_error, _variables, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(queryKey, context.previous);
+      await qc.cancelQueries({ queryKey: QK });
+      const prev = qc.getQueryData<JobsResponse>(QK);
+      if (prev) {
+        qc.setQueryData<JobsResponse>(QK, {
+          ...prev,
+          jobs: prev.jobs.map((j) => (j.id === jobId ? { ...j, saved } : j)),
+        });
       }
-      toast.error('Unable to update saved job.');
+      return { prev };
     },
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey });
-    }
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(QK, ctx.prev);
+      toast.error('Could not save job.');
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: QK }),
   });
 
-  const applyMutation = useMutation({
-    mutationFn: (jobId: number) =>
-      api.post('/api/jobs', {
-        action: 'apply',
-        jobId
-      }),
+  const applyMut = useMutation({
+    mutationFn: (jobId: number) => api.post('/api/jobs', { action: 'apply', jobId }),
     onSuccess: () => {
-      toast.success('Application submitted.');
-      void query.refetch();
+      toast.success('Application submitted! You will receive a confirmation email.');
+      qc.invalidateQueries({ queryKey: QK });
     },
-    onError: () => {
-      toast.error('Unable to apply right now.');
-    }
+    onError: () => toast.error('Could not apply. Please try again.'),
   });
 
-  const filteredJobs = useMemo(() => {
-    const normalizedSearch = normalizeSearch(search);
-
-    return (
-      query.data?.jobs.filter((job: JobPost) => {
-        const matchesSearch =
-          !normalizedSearch ||
-          normalizeSearch(`${job.title} ${job.company}`).includes(normalizedSearch);
-        const matchesFilter = filter === 'All' || job.type.toLowerCase() === filter.toLowerCase();
-
-        return matchesSearch && matchesFilter;
-      }) ?? []
-    );
-  }, [filter, query.data?.jobs, search]);
-
-  if (query.isLoading) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <ScreenSkeleton rows={5} />
-      </SafeAreaView>
-    );
-  }
+  if (query.isLoading) return <SafeAreaView style={s.safe}><ScreenSkeleton rows={5} /></SafeAreaView>;
 
   if (query.isError || !query.data) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <ErrorState
-          title="Unable to load jobs"
-          message="Refresh the jobs board when your connection is back."
-          onRetry={() => void query.refetch()}
-        />
+      <SafeAreaView style={s.safe}>
+        <ErrorState title="Unable to load jobs" message="Check your connection and retry." onRetry={() => void query.refetch()} />
       </SafeAreaView>
     );
   }
 
-  const data = tab === 'browse' ? filteredJobs : query.data.applications;
+  // Backend: { jobs: StudentJobBoardItem[], savedCount, appliedCount }
+  // Each job has: id, title, company, location, salary, type, logo, description, applied, saved, applicationStatus
+  const allJobs = query.data.jobs ?? [];
+  const applied = allJobs.filter((j) => j.applied);
+
+  const browse = useMemo(() => {
+    const q = normalizeSearch(search);
+    return allJobs.filter((j) => {
+      const ms = !q || j.title.toLowerCase().includes(q) || j.company.toLowerCase().includes(q);
+      const mf = filter === 'All' || j.type?.toLowerCase().includes(filter.toLowerCase().replace('-', ''));
+      return ms && mf;
+    });
+  }, [allJobs, search, filter]);
+
+  const listData = tab === 'browse' ? browse : applied;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <FlashList<JobsListItem>
-        data={data as JobsListItem[]}
-        keyExtractor={(item) => ('jobId' in item ? `${item.jobId}` : `${item.id}`)}
+    <SafeAreaView style={s.safe} edges={['top']}>
+      <FlashList<StudentJobBoardItem>
+        data={listData}
+        keyExtractor={(j) => String(j.id)}
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}
@@ -177,201 +113,136 @@ export default function StudentJobsScreen() {
           />
         }
         ListHeaderComponent={
-          <PagePadding style={styles.header}>
-            <View>
-              <Text style={styles.title}>Jobs</Text>
-              <Text style={styles.subtitle}>Browse opportunities and track applications.</Text>
+          <PagePadding>
+            <View style={s.tabs}>
+              {(['browse', 'applied'] as Tab[]).map((t) => (
+                <Pressable
+                  key={t}
+                  accessibilityRole="button"
+                  onPress={() => setTab(t)}
+                  style={[s.tab, tab === t && s.tabActive]}
+                >
+                  <Text style={[s.tabLabel, tab === t && s.tabLabelActive]}>
+                    {t === 'browse' ? 'Browse' : `Applied (${applied.length})`}
+                  </Text>
+                </Pressable>
+              ))}
             </View>
-            <SegmentedTabs
-              value={tab}
-              onChange={setTab}
-              tabs={[
-                { label: 'Browse', value: 'browse' },
-                { label: 'My Applications', value: 'applications' }
-              ]}
-            />
-            {tab === 'browse' ? (
+            {tab === 'browse' && (
               <>
-                <SearchBar
-                  value={search}
-                  onChangeText={setSearch}
-                  placeholder="Search title or company"
-                />
-                <View style={styles.chipRow}>
-                  <FilterChip label="All" selected={filter === 'All'} onPress={() => setFilter('All')} />
-                  {filters.map((option) => (
-                    <FilterChip
-                      key={option}
-                      label={option}
-                      selected={filter === option}
-                      onPress={() => setFilter(option)}
-                    />
+                <SearchBar value={search} onChangeText={setSearch} placeholder="Search jobs…" />
+                <View style={s.chips}>
+                  {FILTERS.map((f) => (
+                    <FilterChip key={f} label={f} selected={filter === f} onPress={() => setFilter(f)} />
                   ))}
                 </View>
               </>
-            ) : null}
+            )}
           </PagePadding>
         }
         ListEmptyComponent={
           <EmptyState
             icon="briefcase-outline"
             title={tab === 'browse' ? 'No jobs found' : 'No applications yet'}
-            subtitle={
-              tab === 'browse'
-                ? 'Try another search or filter.'
-                : 'Jobs you apply to will appear here.'
-            }
+            subtitle={tab === 'browse' ? 'Try a different search or filter.' : 'Browse and tap Apply to get started.'}
           />
         }
-        renderItem={({ item }) =>
-          tab === 'browse' ? (
+        renderItem={({ item }) => (
+          <View style={s.row}>
             <JobCard
-              job={item as JobPost}
-              onSave={() =>
-                saveMutation.mutate({
-                  jobId: (item as JobPost).id,
-                  saved: !(item as JobPost).saved
-                })
-              }
-              onApply={() => applyMutation.mutate((item as JobPost).id)}
-              isApplying={applyMutation.isPending}
+              job={item}
+              onSave={() => saveMut.mutate({ jobId: item.id, saved: !item.saved })}
+              onApply={() => applyMut.mutate(item.id)}
+              applying={applyMut.isPending}
             />
-          ) : (
-            <ApplicationCard application={item as JobApplication} />
-          )
-        }
-        contentContainerStyle={styles.listContent}
+          </View>
+        )}
+        contentContainerStyle={s.list}
       />
     </SafeAreaView>
   );
 }
 
 function JobCard({
-  job,
-  onSave,
-  onApply,
-  isApplying
+  job, onSave, onApply, applying,
 }: {
-  job: JobPost;
+  job: StudentJobBoardItem;
   onSave: () => void;
   onApply: () => void;
-  isApplying: boolean;
+  applying: boolean;
 }) {
   return (
-    <Card style={styles.jobCard}>
-      <View style={styles.jobTitleRow}>
-        <View style={styles.jobTitleText}>
-          <Text style={styles.company}>{job.company}</Text>
-          <Text style={styles.jobTitle}>{job.title}</Text>
+    <Card style={s.card}>
+      <View style={s.cardHeader}>
+        <View style={s.avatar}>
+          <Text style={s.avatarText}>{(job.company ?? '?')[0]?.toUpperCase()}</Text>
         </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={job.saved ? 'Unsave job' : 'Save job'}
-          onPress={onSave}
-          style={styles.saveButton}
-        >
+        <View style={s.meta}>
+          <Text style={s.jobTitle}>{job.title}</Text>
+          <Text style={s.company}>{job.company}</Text>
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel={job.saved ? 'Unsave' : 'Save'} onPress={onSave}>
           <Ionicons
             name={job.saved ? 'bookmark' : 'bookmark-outline'}
-            size={22}
+            size={20}
             color={job.saved ? colors.secondary : colors.textSecondary}
           />
         </Pressable>
       </View>
-      <IconLabel icon="location-outline" title={job.location} subtitle={formatDate(job.postedAt)} />
-      <View style={styles.metaRow}>
-        <Badge label={job.type} tone="info" />
-        {job.salary ? <Text style={styles.salary}>{job.salary}</Text> : null}
+
+      <View style={s.tags}>
+        {job.type ? <Badge label={job.type} tone="info" size="small" /> : null}
+        {job.salary ? <Badge label={job.salary} tone="success" size="small" /> : null}
+        {job.location ? <Badge label={job.location} tone="default" size="small" /> : null}
       </View>
-      <Text style={styles.description} numberOfLines={2}>
-        {job.description}
-      </Text>
-      <Button
-        title={job.applied ? 'Applied' : 'Apply'}
-        disabled={job.applied}
-        loading={isApplying}
-        onPress={onApply}
-      />
+
+      {job.description ? (
+        <Text style={s.desc} numberOfLines={2}>{job.description}</Text>
+      ) : null}
+
+      <View style={s.actions}>
+        {job.applied ? (
+          <Badge
+            label={job.applicationStatus ?? 'Applied ✓'}
+            tone={statusTone(job.applicationStatus ?? 'applied')}
+          />
+        ) : (
+          <Button
+            title={applying ? 'Applying…' : 'Apply Now'}
+            variant="primary"
+            disabled={applying}
+            onPress={onApply}
+          />
+        )}
+      </View>
     </Card>
   );
 }
 
-function ApplicationCard({ application }: { application: JobApplication }) {
-  return (
-    <Card style={styles.jobCard}>
-      <IconLabel
-        icon="checkmark-circle-outline"
-        title={application.title}
-        subtitle={`${application.company} • Applied ${formatDate(application.appliedAt)}`}
-        right={<Badge label={application.status} tone={statusTone(application.status)} />}
-      />
-    </Card>
-  );
-}
-
-const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: colors.background,
-    flex: 1
+const s = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: colors.background },
+  list: { paddingBottom: spacing.xxxl },
+  tabs: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.md },
+  tab: {
+    flex: 1, paddingVertical: 10, borderRadius: 10,
+    backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, alignItems: 'center',
   },
-  header: {
-    paddingBottom: spacing.md
+  tabActive: { backgroundColor: colors.secondary, borderColor: colors.secondary },
+  tabLabel: { ...typography.label, color: colors.textSecondary },
+  tabLabelActive: { color: '#fff' },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: spacing.sm },
+  row: { paddingHorizontal: spacing.xl, marginBottom: spacing.sm },
+  card: { gap: spacing.sm },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  avatar: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: '#DCFCE7', alignItems: 'center', justifyContent: 'center',
   },
-  title: {
-    ...typography.headingLarge
-  },
-  subtitle: {
-    ...typography.body,
-    color: colors.textSecondary,
-    marginTop: spacing.xs
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs
-  },
-  listContent: {
-    paddingBottom: spacing.xxxl
-  },
-  jobCard: {
-    gap: spacing.md,
-    marginBottom: spacing.md,
-    marginHorizontal: spacing.xl
-  },
-  jobTitleRow: {
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    gap: spacing.sm
-  },
-  jobTitleText: {
-    flex: 1,
-    gap: 4
-  },
-  company: {
-    ...typography.caption,
-    color: colors.secondary,
-    fontWeight: '700'
-  },
-  jobTitle: {
-    ...typography.headingSmall
-  },
-  saveButton: {
-    alignItems: 'center',
-    height: 36,
-    justifyContent: 'center',
-    width: 36
-  },
-  metaRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: spacing.sm
-  },
-  salary: {
-    ...typography.body,
-    color: colors.text,
-    fontWeight: '600'
-  },
-  description: {
-    ...typography.body,
-    color: colors.textSecondary
-  }
+  avatarText: { ...typography.headingSmall, color: colors.secondary },
+  meta: { flex: 1 },
+  jobTitle: { ...typography.label, fontSize: 14 },
+  company: { ...typography.caption, color: colors.textSecondary },
+  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
+  desc: { ...typography.caption, color: colors.textSecondary, lineHeight: 18 },
+  actions: { alignItems: 'flex-start' },
 });
