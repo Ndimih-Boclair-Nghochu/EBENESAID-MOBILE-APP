@@ -130,17 +130,25 @@ export async function persistSetCookieHeader(setCookieHeader: unknown): Promise<
   }
 }
 
-function getSessionCandidateFromPayload(payload: unknown): unknown {
-  if (typeof payload !== 'object' || payload === null) {
-    return undefined;
-  }
-
-  const record = payload as Record<string, unknown>;
+function getSessionCandidateFromRecord(record: Record<string, unknown>): unknown {
   const nestedSession = record.session;
 
   if (typeof nestedSession === 'object' && nestedSession !== null) {
     const sessionRecord = nestedSession as Record<string, unknown>;
-    const nestedCandidate = sessionRecord.token ?? sessionRecord.sessionToken ?? sessionRecord.session_token;
+    const nestedCandidate =
+      sessionRecord.token ??
+      sessionRecord.sessionToken ??
+      sessionRecord.session_token ??
+      sessionRecord.value;
+
+    if (nestedCandidate) {
+      return nestedCandidate;
+    }
+  }
+
+  const nestedData = record.data;
+  if (typeof nestedData === 'object' && nestedData !== null) {
+    const nestedCandidate = getSessionCandidateFromRecord(nestedData as Record<string, unknown>);
 
     if (nestedCandidate) {
       return nestedCandidate;
@@ -152,26 +160,51 @@ function getSessionCandidateFromPayload(payload: unknown): unknown {
     record.sessionToken ??
     record.session_token ??
     record.sessionCookie ??
-    record.session_cookie
+    record.session_cookie ??
+    record.token ??
+    record.accessToken ??
+    record.access_token ??
+    record.authToken ??
+    record.auth_token
   );
 }
 
-export async function persistSessionFromAuthPayload(payload: unknown): Promise<void> {
+function getSessionCandidateFromPayload(payload: unknown): unknown {
+  if (typeof payload !== 'object' || payload === null) {
+    return undefined;
+  }
+
+  return getSessionCandidateFromRecord(payload as Record<string, unknown>);
+}
+
+function normalizeSessionCandidate(candidate: string): string {
+  const trimmed = candidate.trim();
+  const parsedCookieValue = parseSessionCookie(trimmed);
+
+  if (parsedCookieValue !== null) {
+    return parsedCookieValue;
+  }
+
+  const bearerMatch = /^bearer\s+(.+)$/i.exec(trimmed);
+  return bearerMatch?.[1]?.trim() ?? trimmed;
+}
+
+export async function persistSessionFromAuthPayload(payload: unknown): Promise<string | null> {
   const candidate = getSessionCandidateFromPayload(payload);
 
   if (typeof candidate !== 'string' || candidate.trim().length === 0) {
-    return;
+    return null;
   }
 
-  const parsedCookieValue = parseSessionCookie(candidate);
-  const value = parsedCookieValue ?? candidate.trim();
+  const value = normalizeSessionCandidate(candidate);
 
   if (!value) {
     await deleteSessionCookieValue();
-    return;
+    return null;
   }
 
   await setSessionCookieValue(value);
+  return value;
 }
 
 export async function clearSessionCookies(): Promise<void> {

@@ -36,7 +36,6 @@ export default function BootstrapScreen() {
   const [state, setState] = useState<BootstrapState>('loading');
   const setUser = useAuthStore((store) => store.setUser);
   const hasHydrated = useAuthStore((store) => store.hasHydrated);
-  const persistedUser = useAuthStore((store) => store.user);
 
   const bootstrap = useCallback(async () => {
     if (!hasHydrated) {
@@ -59,20 +58,14 @@ export default function BootstrapScreen() {
       router.replace(getPortalRoute(user.userType));
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        const currentUser = useAuthStore.getState().user ?? persistedUser;
-
-        if (currentUser) {
-          router.replace(getPortalRoute(currentUser.userType));
-          return;
-        }
-
+        await useAuthStore.getState().clearAuth();
         router.replace('/landing');
         return;
       }
 
       setState('server-error');
     }
-  }, [hasHydrated, persistedUser, setUser]);
+  }, [hasHydrated, setUser]);
 
   useEffect(() => {
     void bootstrap();

@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Stack } from 'expo-router';
+import { router, Stack, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
@@ -19,12 +19,29 @@ import {
   setupNotificationListeners
 } from '@/src/lib/notifications';
 import { initializeQueryPersistence, queryClient } from '@/src/lib/queryClient';
+import { getSessionToken } from '@/src/lib/storage';
 import { useAuthStore } from '@/src/stores/authStore';
+
+const protectedRouteGroups = new Set([
+  '(student)',
+  '(agent)',
+  '(supplier)',
+  '(job-partner)',
+  '(transport)',
+  '(university)',
+  '(investor)',
+  '(staff)',
+  '(admin)'
+]);
 
 function AppChrome() {
   const isOffline = useOfflineStatus();
   const isAuthenticated = useAuthStore((store) => store.isAuthenticated);
+  const hasHydrated = useAuthStore((store) => store.hasHydrated);
   const user = useAuthStore((store) => store.user);
+  const segments = useSegments();
+  const routeGroup = segments[0];
+  const isProtectedRoute = protectedRouteGroups.has(routeGroup ?? '');
 
   useEffect(() => {
     const cleanup = setupNotificationListeners();
@@ -36,6 +53,37 @@ function AppChrome() {
       void setupNotifications(user);
     }
   }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    if (!hasHydrated || !isProtectedRoute) {
+      return;
+    }
+
+    if (!isAuthenticated || !user) {
+      router.replace('/landing');
+    }
+  }, [hasHydrated, isAuthenticated, isProtectedRoute, user]);
+
+  useEffect(() => {
+    if (!hasHydrated || !isProtectedRoute || !isAuthenticated || !user) {
+      return;
+    }
+
+    let isMounted = true;
+
+    void getSessionToken().then(async (sessionToken) => {
+      if (!isMounted || sessionToken) {
+        return;
+      }
+
+      await useAuthStore.getState().clearAuth();
+      router.replace('/landing');
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [hasHydrated, isAuthenticated, isProtectedRoute, user]);
 
   return (
     <>

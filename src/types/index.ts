@@ -32,6 +32,11 @@ export interface AuthLoginResponse {
   message: string;
   user: SafeUser;
   isFirstLogin: boolean;
+  sessionToken?: string;
+  session?: {
+    token?: string;
+    expiresAt?: string;
+  };
 }
 
 export interface ApiError {

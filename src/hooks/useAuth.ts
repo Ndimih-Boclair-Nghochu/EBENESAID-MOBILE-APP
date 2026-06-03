@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { api } from '@/src/lib/api';
 import { clearQueryCache } from '@/src/lib/queryClient';
 import { getPortalRoute } from '@/src/lib/roleRoutes';
-import { persistSessionFromAuthPayload } from '@/src/lib/storage';
+import { getSessionToken, persistSessionFromAuthPayload } from '@/src/lib/storage';
 import { useAuthStore } from '@/src/stores/authStore';
 import type {
   AuthLoginResponse,
@@ -52,16 +52,27 @@ export function getHttpStatus(error: unknown): number | undefined {
 }
 
 export function getApiMessage(error: unknown): string | undefined {
-  if (!axios.isAxiosError(error)) {
-    return undefined;
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as { error?: string; message?: string } | undefined;
+    return data?.error ?? data?.message;
   }
 
-  const data = error.response?.data as { error?: string; message?: string } | undefined;
-  return data?.error ?? data?.message;
+  return error instanceof Error ? error.message : undefined;
 }
 
 export function useAuth() {
   const auth = useAuthStore();
+
+  const verifyMobileSession = async (): Promise<SafeUser> => {
+    const sessionToken = await getSessionToken();
+
+    if (!sessionToken) {
+      throw new Error('The server did not return a mobile session. Please sign in again.');
+    }
+
+    const response = await api.get<AuthMeResponse | SafeUser>('/api/auth/me');
+    return extractUser(response.data);
+  };
 
   const login = async (email: string, password: string): Promise<AuthLoginResponse> => {
     auth.setLoading(true);
@@ -75,7 +86,20 @@ export function useAuth() {
       await persistSessionFromAuthPayload(response.data);
       await clearQueryCache();
 
-      const user = extractUser(response.data);
+      let user: SafeUser;
+
+      try {
+        user = await verifyMobileSession();
+      } catch (verificationError) {
+        await auth.clearAuth();
+
+        if (axios.isAxiosError(verificationError) && verificationError.response?.status === 401) {
+          throw new Error('Signed in, but the mobile session could not be verified. Please try again.');
+        }
+
+        throw verificationError;
+      }
+
       auth.setUser(user);
       router.replace(getPortalRoute(user.userType));
 
@@ -117,9 +141,16 @@ export function useAuth() {
 
     await persistSessionFromAuthPayload(response.data);
     await clearQueryCache();
-    auth.setUser(responseUser);
-    router.replace(getPortalRoute(responseUser.userType));
-    return responseUser;
+
+    try {
+      const verifiedUser = await verifyMobileSession();
+      auth.setUser(verifiedUser);
+      router.replace(getPortalRoute(verifiedUser.userType));
+      return verifiedUser;
+    } catch {
+      await auth.clearAuth();
+      return null;
+    }
   };
 
   const forgotPassword = (email: string) =>

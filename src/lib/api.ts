@@ -1,4 +1,5 @@
 import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+import { router } from 'expo-router';
 
 import { toast } from '@/src/components/ui/Toast';
 import { useAuthStore } from '@/src/stores/authStore';
@@ -149,6 +150,25 @@ function buildFallbackResponse(error: unknown): AxiosResponse | null {
   };
 }
 
+function getHeaderValue(headers: unknown, name: string): unknown {
+  if (!headers || typeof headers !== 'object') {
+    return undefined;
+  }
+
+  const accessor = headers as { get?: (headerName: string) => unknown };
+
+  if (typeof accessor.get === 'function') {
+    const value = accessor.get(name) ?? accessor.get(name.toLowerCase());
+
+    if (value) {
+      return value;
+    }
+  }
+
+  const record = headers as Record<string, unknown>;
+  return record[name] ?? record[name.toLowerCase()] ?? record[name.toUpperCase()];
+}
+
 function setHeader(config: InternalAxiosRequestConfig, name: string, value: string): void {
   if (typeof config.headers.set === 'function') {
     config.headers.set(name, value);
@@ -160,6 +180,35 @@ function setHeader(config: InternalAxiosRequestConfig, name: string, value: stri
 
 function setCookieHeader(config: InternalAxiosRequestConfig, cookieHeader: string): void {
   setHeader(config, 'Cookie', cookieHeader);
+}
+
+let sessionRedirectInFlight = false;
+
+async function handleUnauthorizedSession(error: unknown): Promise<void> {
+  if (!axios.isAxiosError(error) || error.response?.status !== 401) {
+    return;
+  }
+
+  const path = getEndpointPath(error.config?.url);
+
+  if (path.startsWith('/api/auth/')) {
+    return;
+  }
+
+  const auth = useAuthStore.getState();
+
+  if (!auth.user || sessionRedirectInFlight) {
+    return;
+  }
+
+  sessionRedirectInFlight = true;
+  try {
+    toast.info('Session expired. Please sign in again.');
+    await auth.clearAuth();
+    router.replace('/(auth)/login');
+  } finally {
+    sessionRedirectInFlight = false;
+  }
 }
 
 api.interceptors.request.use(async (config) => {
@@ -175,6 +224,7 @@ api.interceptors.request.use(async (config) => {
   if (sessionToken) {
     setHeader(config, 'Authorization', `Bearer ${sessionToken}`);
     setHeader(config, 'X-EBENESAID-Session', sessionToken);
+    setHeader(config, 'X-Session-Token', sessionToken);
   }
 
   return config;
@@ -182,17 +232,17 @@ api.interceptors.request.use(async (config) => {
 
 api.interceptors.response.use(
   async (response) => {
-    await persistSetCookieHeader(response.headers['set-cookie'] ?? response.headers['Set-Cookie']);
+    await persistSetCookieHeader(getHeaderValue(response.headers, 'set-cookie'));
     return response;
   },
   async (error) => {
-    await persistSetCookieHeader(
-      error.response?.headers?.['set-cookie'] ?? error.response?.headers?.['Set-Cookie']
-    );
+    await persistSetCookieHeader(getHeaderValue(error.response?.headers, 'set-cookie'));
 
     if (error.response?.status === 429) {
       toast.info('Too many requests. Please wait.');
     }
+
+    await handleUnauthorizedSession(error);
 
     const fallbackResponse = buildFallbackResponse(error);
 
