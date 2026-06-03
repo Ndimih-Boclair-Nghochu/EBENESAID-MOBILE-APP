@@ -25,10 +25,10 @@ type SettingsItem = PartnerRecord & { section: 'institution' | 'employer' };
 export default function AdminSettingsScreen() {
   const { logout, isLoading } = useAuth();
   const query = useQuery({
-    queryKey: ['/api/admin/profile', '/api/admin/institutions', '/api/admin/employers'],
+    queryKey: ['/api/auth/me', '/api/admin/institutions', '/api/admin/employers'],
     queryFn: async () => {
       const [profile, institutions, employers] = await Promise.all([
-        api.get('/api/admin/profile').catch(() => ({ data: {} })),
+        api.get('/api/auth/me').catch(() => ({ data: {} })),
         api.get('/api/admin/institutions'),
         api.get('/api/admin/employers')
       ]);

@@ -8,8 +8,8 @@ export default function UniversitySummaryScreen() {
       endpoint="/api/university/summary"
       showAssistant
       metrics={[
-        { label: 'Enrolled Students', key: 'enrolledStudents', format: 'number' },
-        { label: 'Pending Applications', key: 'pendingApplications', format: 'number' },
+        { label: 'Applications', key: 'applications', format: 'number' },
+        { label: 'Pending Applications', key: 'pending', format: 'number' },
         { label: 'Active Programs', key: 'activePrograms', format: 'number' }
       ]}
     />

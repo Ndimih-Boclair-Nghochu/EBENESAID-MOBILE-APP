@@ -9,10 +9,10 @@ export default function TransportSummaryScreen() {
       revenueRoute="/(transport)/revenue"
       showAssistant
       metrics={[
-        { label: 'Trips Today', key: 'tripsToday', format: 'number' },
+        { label: 'Total Bookings', key: 'totalBookings', format: 'number' },
         { label: 'Revenue', key: 'revenue', format: 'currency' },
-        { label: 'Fleet Size', key: 'fleetSize', format: 'number' },
-        { label: 'Pending Pickups', key: 'pendingPickups', format: 'number' }
+        { label: 'Services', key: 'totalServices', format: 'number' },
+        { label: 'Pending Pickups', key: 'pendingBookings', format: 'number' }
       ]}
     />
   );

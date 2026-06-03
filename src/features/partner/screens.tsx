@@ -215,7 +215,7 @@ export function isRecord(value: unknown): value is PartnerRecord {
 }
 
 function nestedRecords(record: PartnerRecord): PartnerRecord[] {
-  return ['overview', 'metrics', 'summary', 'totals', 'statistics', 'finance', 'institutions', 'partnerProfile']
+  return ['overview', 'metrics', 'summary', 'totals', 'statistics', 'finance', 'institutions', 'partnerProfile', 'profile']
     .map((key) => record[key])
     .filter(isRecord);
 }
@@ -688,7 +688,8 @@ export function ProfileFormScreen({
   endpoint,
   fields,
   profileImageRole,
-  profileImageField = 'logoUrl'
+  profileImageField = 'logoUrl',
+  saveEnabled = true
 }: {
   portalName: string;
   subtitle: string;
@@ -696,6 +697,7 @@ export function ProfileFormScreen({
   fields: FieldConfig[];
   profileImageRole?: string;
   profileImageField?: string;
+  saveEnabled?: boolean;
 }) {
   const { logout, isLoading, user } = useAuth();
   const [form, setForm] = useState<PartnerRecord>({});
@@ -707,7 +709,7 @@ export function ProfileFormScreen({
 
   useEffect(() => {
     const record = extractRecord(query.data);
-    setForm(isRecord(record.profile) ? record.profile : record);
+    setForm(isRecord(record.profile) ? record.profile : isRecord(record.user) ? record.user : record);
   }, [query.data]);
 
   const saveMutation = useMutation({
@@ -845,7 +847,9 @@ export function ProfileFormScreen({
             )}
             ListFooterComponent={
               <View style={styles.profileFooter}>
-                <Button title="Save profile" loading={saveMutation.isPending} onPress={() => saveMutation.mutate()} />
+                {saveEnabled ? (
+                  <Button title="Save profile" loading={saveMutation.isPending} onPress={() => saveMutation.mutate()} />
+                ) : null}
                 <Button title="Logout" variant="danger" loading={isLoading} onPress={logout} />
               </View>
             }

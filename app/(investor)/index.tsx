@@ -42,6 +42,15 @@ export default function InvestorSummaryScreen() {
 
   const data = extractRecord(query.data);
   const growth = extractArray(query.data, ['growthMetrics', 'growth', 'metrics']);
+  const totalUsers =
+    getNumber(data, 'totalUsers') ||
+    getNumber(data, 'students') + getNumber(data, 'partners') + getNumber(data, 'investors');
+  const revenue =
+    getNumber(data, 'revenue') ||
+    getNumber(data, 'studentRevenueEur') + getNumber(data, 'partnerNetEur');
+  const serviceRecords =
+    getNumber(data, 'housingListings') ||
+    getNumber(data, 'listings') + getNumber(data, 'jobs') + getNumber(data, 'foodItems') + getNumber(data, 'transportBookings');
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -61,12 +70,12 @@ export default function InvestorSummaryScreen() {
             <PartnerHeader portalName="Investor Dashboard" subtitle="Read-only platform performance." />
             <Button title="Profile" variant="secondary" onPress={() => router.push('/(investor)/profile')} />
             <View style={styles.metricRow}>
-              <MetricCard label="Total Users" value={formatValue(data.totalUsers, 'number')} />
-              <MetricCard label="Revenue" value={formatValue(data.revenue, 'currency')} />
+              <MetricCard label="Total Users" value={formatValue(totalUsers, 'number')} />
+              <MetricCard label="Revenue" value={formatValue(revenue, 'currency')} />
             </View>
             <View style={styles.metricRow}>
-              <MetricCard label="Housing Listings" value={formatValue(data.housingListings, 'number')} />
-              <MetricCard label="Active Orders" value={formatValue(data.activeOrders, 'number')} />
+              <MetricCard label="Partners" value={formatValue(data.partners, 'number')} />
+              <MetricCard label="Service Records" value={formatValue(serviceRecords, 'number')} />
             </View>
             <Text style={styles.sectionTitle}>Growth Metrics</Text>
           </View>

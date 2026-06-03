@@ -44,7 +44,7 @@ export function subscribeNotificationPrompt(listener: PromptListener) {
   };
 }
 
-function profileEndpointForUser(user: SafeUser) {
+function profileEndpointForUser(user: SafeUser): string | null {
   switch (user.userType) {
     case 'agent':
       return '/api/agent/profile';
@@ -56,14 +56,11 @@ function profileEndpointForUser(user: SafeUser) {
       return '/api/transport/profile';
     case 'university':
       return '/api/university/profile';
-    case 'staff':
-      return '/api/staff/profile';
-    case 'admin':
-      return '/api/admin/profile';
-    case 'investor':
-      return '/api/investor/profile';
-    default:
+    case 'student':
+    case 'resident':
       return '/api/student/profile';
+    default:
+      return null;
   }
 }
 
@@ -74,12 +71,10 @@ async function registerPushToken(user: SafeUser) {
   const token = tokenData.data;
   await storage.set(PUSH_TOKEN_KEY, token);
 
-  try {
-    await api.patch(profileEndpointForUser(user), {
-      pushToken: token
-    });
-  } catch {
-    await api.patch('/api/student/profile', {
+  const endpoint = profileEndpointForUser(user);
+
+  if (endpoint) {
+    await api.patch(endpoint, {
       pushToken: token
     });
   }

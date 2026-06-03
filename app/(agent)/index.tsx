@@ -9,9 +9,9 @@ export default function AgentSummaryScreen() {
       showAssistant
       metrics={[
         { label: 'Total Listings', key: 'totalListings', format: 'number' },
-        { label: 'Active Enquiries', key: 'activeEnquiries', format: 'number' },
-        { label: 'Confirmed Bookings', key: 'confirmedBookings', format: 'number' },
-        { label: 'Revenue', key: 'revenue', format: 'currency' }
+        { label: 'Active Enquiries', key: 'totalEnquiries', format: 'number' },
+        { label: 'Confirmed Bookings', key: 'totalBookings', format: 'number' },
+        { label: 'Revenue', key: 'revenueEstimate', format: 'currency' }
       ]}
     />
   );

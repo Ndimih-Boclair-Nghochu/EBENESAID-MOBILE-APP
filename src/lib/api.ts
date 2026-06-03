@@ -62,7 +62,6 @@ function getAccountFallback(path: string, user: SafeUser | null): unknown | unde
     '/api/agent/profile': {},
     '/api/agent/bookings': { bookings: [] },
     '/api/agent/listings': { listings: [] },
-    '/api/agent/leads': { leads: [] },
     '/api/agent/verification': { documents: [], verification: [] },
     '/api/supplier/summary': { recentActivity: [] },
     '/api/supplier/profile': {},
@@ -85,8 +84,6 @@ function getAccountFallback(path: string, user: SafeUser | null): unknown | unde
     '/api/university/programs': { programs: [] },
     '/api/university/applications': { applications: [] },
     '/api/university/chat': { conversations: [], messages: [] },
-    '/api/university/students': { students: [] },
-    '/api/university/verification': { documents: [], verification: [] },
     '/api/staff/summary': { metrics: {}, workQueues: [] },
     '/api/admin/summary': {
       overview: {},
@@ -98,7 +95,6 @@ function getAccountFallback(path: string, user: SafeUser | null): unknown | unde
       statistics: {},
       institutions: {}
     },
-    '/api/admin/profile': {},
     '/api/admin/users': { users: [] },
     '/api/admin/verification': { documents: [], verification: [] },
     '/api/admin/content': { content: [], pages: [] },

@@ -9,8 +9,8 @@ export default function JobPartnerSummaryScreen() {
       showAssistant
       metrics={[
         { label: 'Active Jobs', key: 'activeJobs', format: 'number' },
-        { label: 'Total Applicants', key: 'totalApplicants', format: 'number' },
-        { label: 'Hired Count', key: 'hiredCount', format: 'number' }
+        { label: 'Total Applicants', key: 'applications', format: 'number' },
+        { label: 'Hired Count', key: 'hired', format: 'number' }
       ]}
     />
   );

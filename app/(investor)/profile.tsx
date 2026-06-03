@@ -5,7 +5,8 @@ export default function InvestorProfileScreen() {
     <ProfileFormScreen
       portalName="Investor Profile"
       subtitle="Investor account details."
-      endpoint="/api/investor/profile"
+      endpoint="/api/auth/me"
+      saveEnabled={false}
       fields={[
         { key: 'firstName', label: 'First name' },
         { key: 'lastName', label: 'Last name' },

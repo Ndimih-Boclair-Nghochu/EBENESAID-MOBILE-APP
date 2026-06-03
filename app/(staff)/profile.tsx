@@ -5,7 +5,8 @@ export default function StaffProfileScreen() {
     <ProfileFormScreen
       portalName="Staff Profile"
       subtitle="Staff account and contact details."
-      endpoint="/api/staff/profile"
+      endpoint="/api/auth/me"
+      saveEnabled={false}
       fields={[
         { key: 'firstName', label: 'First name' },
         { key: 'lastName', label: 'Last name' },

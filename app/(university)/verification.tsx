@@ -31,8 +31,8 @@ const maxPdfSize = 8 * 1024 * 1024;
 export default function UniversityVerificationScreen() {
   const user = useAuthStore((store) => store.user);
   const query = useQuery<unknown>({
-    queryKey: ['/api/university/verification'],
-    queryFn: async () => (await api.get('/api/university/verification')).data,
+    queryKey: ['/api/university/profile', 'verification'],
+    queryFn: async () => (await api.get('/api/university/profile')).data,
     staleTime: 1000 * 60 * 3,
     gcTime: 1000 * 60 * 30,
     placeholderData: keepPreviousData
@@ -71,8 +71,9 @@ export default function UniversityVerificationScreen() {
         file.mimeType
       );
 
-      return api.post('/api/university/verification', {
+      return api.post('/api/university/profile', {
         name: file.filename,
+        type: file.mimeType,
         fileUrl,
         storageKey
       });

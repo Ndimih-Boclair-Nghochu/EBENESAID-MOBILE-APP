@@ -10,8 +10,8 @@ export default function SupplierSummaryScreen() {
       metrics={[
         { label: 'Total Orders', key: 'totalOrders', format: 'number' },
         { label: 'Revenue', key: 'revenue', format: 'currency' },
-        { label: 'Pending', key: 'pending', format: 'number' },
-        { label: 'Menu Items', key: 'menuItems', format: 'number' }
+        { label: 'Pending', key: 'pendingOrders', format: 'number' },
+        { label: 'Menu Items', key: 'totalProducts', format: 'number' }
       ]}
     />
   );

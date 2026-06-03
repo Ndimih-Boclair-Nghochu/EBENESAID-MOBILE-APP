@@ -7,10 +7,10 @@ export default function StaffDashboardScreen() {
       subtitle="Platform stats and operations overview."
       endpoint="/api/staff/summary"
       metrics={[
-        { label: 'Users', key: 'users', format: 'number' },
-        { label: 'Open Tickets', key: 'openTickets', format: 'number' },
-        { label: 'Listings', key: 'listings', format: 'number' },
-        { label: 'Orders', key: 'orders', format: 'number' }
+        { label: 'Students', key: 'activeStudents', format: 'number' },
+        { label: 'Support Threads', key: 'supportThreads', format: 'number' },
+        { label: 'Pending Verifications', key: 'pendingVerifications', format: 'number' },
+        { label: 'Active Orders', key: 'activeOrders', format: 'number' }
       ]}
     />
   );
