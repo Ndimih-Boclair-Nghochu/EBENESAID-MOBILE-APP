@@ -1,5 +1,4 @@
 import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
-import { router } from 'expo-router';
 
 import { toast } from '@/src/components/ui/Toast';
 import { useAuthStore } from '@/src/stores/authStore';
@@ -167,22 +166,6 @@ function setCookieHeader(config: InternalAxiosRequestConfig, cookieHeader: strin
   setHeader(config, 'Cookie', cookieHeader);
 }
 
-function isAuthSessionCheck(url: unknown): boolean {
-  return typeof url === 'string' && url.includes('/api/auth/me');
-}
-
-function isAuthenticationRoute(url: unknown): boolean {
-  return (
-    typeof url === 'string' &&
-    (
-      url.includes('/api/auth/login') ||
-      url.includes('/api/auth/register') ||
-      url.includes('/api/auth/forgot-password') ||
-      url.includes('/api/auth/reset-password')
-    )
-  );
-}
-
 api.interceptors.request.use(async (config) => {
   const [cookieHeader, sessionToken] = await Promise.all([
     getSessionCookieHeader(),
@@ -210,14 +193,6 @@ api.interceptors.response.use(
     await persistSetCookieHeader(
       error.response?.headers?.['set-cookie'] ?? error.response?.headers?.['Set-Cookie']
     );
-
-    if (error.response?.status === 401 && isAuthSessionCheck(error.config?.url)) {
-      void useAuthStore.getState().clearAuth();
-      router.replace('/landing');
-    } else if (error.response?.status === 401 && !isAuthenticationRoute(error.config?.url)) {
-      void useAuthStore.getState().clearAuth();
-      router.replace('/landing');
-    }
 
     if (error.response?.status === 429) {
       toast.info('Too many requests. Please wait.');
