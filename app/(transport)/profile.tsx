@@ -6,6 +6,8 @@ export default function TransportProfileScreen() {
       portalName="Transport Profile"
       subtitle="Operator details and dispatch contacts."
       endpoint="/api/transport/profile"
+      profileImageRole="transport"
+      profileImageField="logoUrl"
       fields={[
         { key: 'businessName', label: 'Business name' },
         { key: 'contactPerson', label: 'Contact person' },

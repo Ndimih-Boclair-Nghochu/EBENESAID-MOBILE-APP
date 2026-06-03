@@ -6,6 +6,8 @@ export default function JobPartnerProfileScreen() {
       portalName="Job Partner Profile"
       subtitle="Employer profile and contact details."
       endpoint="/api/job-partner/profile"
+      profileImageRole="jobPartner"
+      profileImageField="logoUrl"
       fields={[
         { key: 'company', label: 'Company' },
         { key: 'contactPerson', label: 'Contact person' },

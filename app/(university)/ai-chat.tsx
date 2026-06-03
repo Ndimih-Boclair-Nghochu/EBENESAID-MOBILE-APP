@@ -61,7 +61,7 @@ export default function UniversityAIChatScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <KeyboardAvoidingView behavior={Platform.select({ ios: 'padding', android: undefined })} style={styles.keyboard}>
         <View style={styles.content}>
-          <PartnerHeader portalName="AI Chat" subtitle="University AI assistant." />
+          <PartnerHeader portalName="Student Messages" subtitle="Message your enrolled students" />
           <View style={styles.chat}>
             <FlashList<ChatMessage>
               ref={listRef}

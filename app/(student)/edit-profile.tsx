@@ -3,11 +3,13 @@ import {
 import { keepPreviousData,
   useMutation,
   useQuery } from '@tanstack/react-query';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect,
   useMemo,
   useState } from 'react';
-import { RefreshControl,
+import { Alert,
+  RefreshControl,
   StyleSheet,
   View
 } from 'react-native';
@@ -17,12 +19,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { ErrorState } from '@/src/components/ui/ErrorState';
+import { ProfilePhotoUploader } from '@/src/components/ProfilePhotoUploader';
 import { toast } from '@/src/components/ui/Toast';
 import { colors, radius, spacing, typography } from '@/src/constants';
 import { PagePadding, ProgressBar, ScreenSkeleton } from '@/src/features/student/components';
 import type { StudentProfile } from '@/src/features/student/types';
 import { studentQueryTimes } from '@/src/features/student/utils';
 import { api } from '@/src/lib/api';
+import { normalizeImageAsset, validatePickedFile } from '@/src/lib/pickedFile';
+import { uploadProfilePhoto } from '@/src/lib/uploadFile';
+import { useAuthStore } from '@/src/stores/authStore';
 
 import { Text } from '@/src/components/ui/TranslatedText';
 
@@ -65,6 +71,9 @@ const fields: Array<{ key: FieldKey; label: string }> = [
   { key: 'passportExpiryDate', label: 'Passport expiry date' }
 ];
 
+const allowedProfilePhotoMimeTypes = ['image/jpeg', 'image/png'] as const;
+const maxProfilePhotoSize = 5 * 1024 * 1024;
+
 async function fetchProfile() {
   const response = await api.get<StudentProfile | { profile: StudentProfile }>('/api/student/profile');
 
@@ -97,6 +106,7 @@ function emptyForm(): EditableProfile {
 
 export default function EditProfileScreen() {
   const [form, setForm] = useState<EditableProfile>(emptyForm);
+  const user = useAuthStore((store) => store.user);
 
   const query = useQuery<StudentProfile>({
     queryKey: ['student', 'profile'],
@@ -144,6 +154,81 @@ export default function EditProfileScreen() {
     }
   });
 
+  const photoMutation = useMutation({
+    mutationFn: async (asset: ImagePicker.ImagePickerAsset) => {
+      if (!user) {
+        throw new Error('You must be signed in to upload a profile photo.');
+      }
+
+      const file = normalizeImageAsset(asset, 'profile-photo.jpg');
+      const validationError = validatePickedFile(
+        file,
+        allowedProfilePhotoMimeTypes,
+        maxProfilePhotoSize
+      );
+
+      if (validationError) {
+        throw new Error(validationError);
+      }
+
+      const { fileUrl } = await uploadProfilePhoto(user.id, file.uri, file.filename, file.mimeType);
+      await api.patch('/api/student/profile', {
+        profilePhotoUrl: fileUrl
+      });
+    },
+    onSuccess: () => {
+      toast.success('Profile photo updated.');
+      void query.refetch();
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Unable to update profile photo.');
+    }
+  });
+
+  const pickProfilePhoto = async (source: 'camera' | 'library') => {
+    const permission =
+      source === 'camera'
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      toast.error('Permission is required to change your photo.');
+      return;
+    }
+
+    const result =
+      source === 'camera'
+        ? await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 0.85
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 0.85
+          });
+
+    if (!result.canceled) {
+      const asset = result.assets?.[0];
+      if (!asset) {
+        return;
+      }
+
+      photoMutation.mutate(asset);
+    }
+  };
+
+  const openPhotoActions = () => {
+    Alert.alert('Change photo', 'Choose a profile photo source.', [
+      { text: 'Take Photo', onPress: () => void pickProfilePhoto('camera') },
+      { text: 'Choose from Library', onPress: () => void pickProfilePhoto('library') },
+      { text: 'Cancel', style: 'cancel' }
+    ]);
+  };
+
   if (query.isLoading) {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -181,6 +266,12 @@ export default function EditProfileScreen() {
         ListHeaderComponent={
           <PagePadding style={styles.header}>
             <Text style={styles.title}>Edit Profile</Text>
+            <ProfilePhotoUploader
+              imageUrl={query.data.profilePhotoUrl}
+              name={`${query.data.firstName} ${query.data.lastName}`}
+              uploading={photoMutation.isPending}
+              onPress={openPhotoActions}
+            />
             <Card>
               <ProgressBar percent={completionPercent} label="Profile completion" />
             </Card>

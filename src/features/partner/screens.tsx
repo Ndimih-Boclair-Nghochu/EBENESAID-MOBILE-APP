@@ -6,6 +6,7 @@ import { keepPreviousData,
   useMutation,
   useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import { Tabs,
   router } from 'expo-router';
 import { useEffect,
@@ -28,6 +29,8 @@ import { DataTable } from '@/src/components/partner/DataTable';
 import { MetricCard } from '@/src/components/partner/MetricCard';
 import { PartnerHeader } from '@/src/components/partner/PartnerHeader';
 import { StatusBadge, type StatusBadgeTone } from '@/src/components/partner/StatusBadge';
+import { AIAssistantFAB } from '@/src/components/AIAssistantFAB';
+import { ProfilePhotoUploader } from '@/src/components/ProfilePhotoUploader';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { EmptyState } from '@/src/components/ui/EmptyState';
@@ -37,6 +40,8 @@ import { toast } from '@/src/components/ui/Toast';
 import { colors, radius, spacing, typography } from '@/src/constants';
 import { useAuth } from '@/src/hooks/useAuth';
 import { api } from '@/src/lib/api';
+import { normalizeImageAsset, validatePickedFile } from '@/src/lib/pickedFile';
+import { uploadPartnerDocument } from '@/src/lib/uploadFile';
 
 import { Text } from '@/src/components/ui/TranslatedText';
 
@@ -86,6 +91,9 @@ const defaultQueryOptions = {
   gcTime: 1000 * 60 * 60,
   placeholderData: keepPreviousData
 };
+
+const allowedProfilePhotoMimeTypes = ['image/jpeg', 'image/png'] as const;
+const maxProfilePhotoSize = 5 * 1024 * 1024;
 
 export function PartnerTabsLayout({
   tabs,
@@ -287,7 +295,8 @@ export function SummaryScreen({
   endpoint,
   metrics,
   activityKeys = ['recentActivity', 'activity', 'activities'],
-  revenueRoute
+  revenueRoute,
+  showAssistant = false
 }: {
   portalName: string;
   subtitle: string;
@@ -295,6 +304,7 @@ export function SummaryScreen({
   metrics: MetricConfig[];
   activityKeys?: string[];
   revenueRoute?: string;
+  showAssistant?: boolean;
 }) {
   const query = useQuery<unknown>({
     queryKey: [endpoint],
@@ -355,6 +365,7 @@ export function SummaryScreen({
         renderItem={({ item }) => <ActivityCard record={item} />}
         contentContainerStyle={styles.listContent}
       />
+      {showAssistant ? <AIAssistantFAB /> : null}
     </SafeAreaView>
   );
 }
@@ -655,14 +666,18 @@ export function ProfileFormScreen({
   portalName,
   subtitle,
   endpoint,
-  fields
+  fields,
+  profileImageRole,
+  profileImageField = 'logoUrl'
 }: {
   portalName: string;
   subtitle: string;
   endpoint: string;
   fields: FieldConfig[];
+  profileImageRole?: string;
+  profileImageField?: string;
 }) {
-  const { logout, isLoading } = useAuth();
+  const { logout, isLoading, user } = useAuth();
   const [form, setForm] = useState<PartnerRecord>({});
   const query = useQuery<unknown>({
     queryKey: [endpoint],
@@ -686,6 +701,87 @@ export function ProfileFormScreen({
     }
   });
 
+  const photoMutation = useMutation({
+    mutationFn: async (asset: ImagePicker.ImagePickerAsset) => {
+      if (!user || !profileImageRole) {
+        throw new Error('You must be signed in to upload a profile photo.');
+      }
+
+      const file = normalizeImageAsset(asset, 'profile-photo.jpg');
+      const validationError = validatePickedFile(
+        file,
+        allowedProfilePhotoMimeTypes,
+        maxProfilePhotoSize
+      );
+
+      if (validationError) {
+        throw new Error(validationError);
+      }
+
+      const { fileUrl } = await uploadPartnerDocument(
+        user.id,
+        profileImageRole,
+        file.uri,
+        file.filename,
+        file.mimeType
+      );
+      await api.patch(endpoint, {
+        [profileImageField]: fileUrl
+      });
+    },
+    onSuccess: () => {
+      toast.success('Profile photo updated.');
+      void query.refetch();
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Unable to update profile photo.');
+    }
+  });
+
+  const pickProfilePhoto = async (source: 'camera' | 'library') => {
+    const permission =
+      source === 'camera'
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      toast.error('Permission is required to change your photo.');
+      return;
+    }
+
+    const result =
+      source === 'camera'
+        ? await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 0.85
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 0.85
+          });
+
+    if (!result.canceled) {
+      const asset = result.assets?.[0];
+      if (!asset) {
+        return;
+      }
+
+      photoMutation.mutate(asset);
+    }
+  };
+
+  const openPhotoActions = () => {
+    Alert.alert('Change photo', 'Choose a profile photo source.', [
+      { text: 'Take Photo', onPress: () => void pickProfilePhoto('camera') },
+      { text: 'Choose from Library', onPress: () => void pickProfilePhoto('library') },
+      { text: 'Cancel', style: 'cancel' }
+    ]);
+  };
+
   if (query.isLoading) {
     return <LoadingPortalScreen portalName={portalName} subtitle={subtitle} />;
   }
@@ -698,6 +794,24 @@ export function ProfileFormScreen({
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.content}>
         <PartnerHeader portalName={portalName} subtitle={subtitle} />
+        {profileImageRole ? (
+          <ProfilePhotoUploader
+            imageUrl={
+              getString(form, profileImageField) ||
+              getString(form, 'avatarUrl') ||
+              getString(form, 'logoUrl')
+            }
+            name={
+              getString(form, 'businessName') ||
+              getString(form, 'company') ||
+              getString(form, 'schoolName') ||
+              getString(form, 'contactPerson') ||
+              portalName
+            }
+            uploading={photoMutation.isPending}
+            onPress={openPhotoActions}
+          />
+        ) : null}
         <View style={styles.flexList}>
           <FlashList<FieldConfig>
             data={fields}

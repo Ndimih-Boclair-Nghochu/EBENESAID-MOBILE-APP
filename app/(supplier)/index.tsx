@@ -6,6 +6,7 @@ export default function SupplierSummaryScreen() {
       portalName="Supplier Portal"
       subtitle="Orders, revenue, pending work, and menu health."
       endpoint="/api/supplier/summary"
+      showAssistant
       metrics={[
         { label: 'Total Orders', key: 'totalOrders', format: 'number' },
         { label: 'Revenue', key: 'revenue', format: 'currency' },

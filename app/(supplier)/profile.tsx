@@ -6,6 +6,8 @@ export default function SupplierProfileScreen() {
       portalName="Supplier Profile"
       subtitle="Supplier account and payout contact details."
       endpoint="/api/supplier/profile"
+      profileImageRole="supplier"
+      profileImageField="logoUrl"
       fields={[
         { key: 'businessName', label: 'Business name' },
         { key: 'contactPerson', label: 'Contact person' },

@@ -6,6 +6,7 @@ export default function AgentSummaryScreen() {
       portalName="Agent Portal"
       subtitle="Listings, enquiries, bookings, and revenue."
       endpoint="/api/agent/summary"
+      showAssistant
       metrics={[
         { label: 'Total Listings', key: 'totalListings', format: 'number' },
         { label: 'Active Enquiries', key: 'activeEnquiries', format: 'number' },

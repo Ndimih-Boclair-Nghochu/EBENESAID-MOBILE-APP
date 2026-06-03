@@ -23,9 +23,16 @@ npm run android
 
 ```bash
 EXPO_PUBLIC_API_URL=https://ebenesaid.com
+EXPO_PUBLIC_FIREBASE_API_KEY=
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+EXPO_PUBLIC_FIREBASE_APP_ID=
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
 ```
 
 The app uses cookie-based sessions with the `eb_session` cookie. Session tokens are never stored in MMKV or AsyncStorage.
+For Firebase Storage uploads, copy the backend Hostinger `NEXT_PUBLIC_FIREBASE_*` values and add them to the mobile `.env.local` file with the `EXPO_PUBLIC_` prefix.
 
 ## Build
 
@@ -71,7 +78,7 @@ npx eas build --platform all
 ## Known Limitations and TODOs
 
 - Replace placeholder app icons and splash assets before app store submission.
-- Document uploads currently use placeholder storage keys; Firebase Storage upload is reserved for a later backend integration pass.
+- Document and profile uploads use Firebase Storage when the `EXPO_PUBLIC_FIREBASE_*` values are configured, with an inline data URL fallback for local review builds.
 - Calendar integration in Community Events is stubbed.
 - Admin finance combines multiple endpoint payloads defensively because backend response shapes may vary.
 - Push token registration currently PATCHes the student profile endpoint and stores the token locally if a role endpoint does not accept it.

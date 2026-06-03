@@ -53,7 +53,7 @@ export default function BootstrapScreen() {
       router.replace(getPortalRoute(user.userType));
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        router.replace('/(auth)/login');
+        router.replace('/landing');
         return;
       }
 

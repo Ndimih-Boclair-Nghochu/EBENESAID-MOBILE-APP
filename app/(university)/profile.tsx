@@ -6,6 +6,8 @@ export default function UniversityProfileScreen() {
       portalName="University Profile"
       subtitle="Institution details and admissions contact."
       endpoint="/api/university/profile"
+      profileImageRole="university"
+      profileImageField="logoUrl"
       fields={[
         { key: 'schoolName', label: 'School name' },
         { key: 'contactPerson', label: 'Contact person' },

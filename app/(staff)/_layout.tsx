@@ -8,6 +8,7 @@ export default function StaffLayout() {
         { name: 'users', title: 'Users', activeIcon: 'people', inactiveIcon: 'people-outline' },
         { name: 'support', title: 'Support', activeIcon: 'chatbubbles', inactiveIcon: 'chatbubbles-outline' },
         { name: 'reports', title: 'Reports', activeIcon: 'document-text', inactiveIcon: 'document-text-outline' },
+        { name: 'verification', title: 'Verify', activeIcon: 'shield-checkmark', inactiveIcon: 'shield-checkmark-outline' },
         { name: 'profile', title: 'Profile', activeIcon: 'person', inactiveIcon: 'person-outline' }
       ]}
     />

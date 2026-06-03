@@ -6,6 +6,7 @@ export default function UniversitySummaryScreen() {
       portalName="University Portal"
       subtitle="Students, applications, and active programs."
       endpoint="/api/university/summary"
+      showAssistant
       metrics={[
         { label: 'Enrolled Students', key: 'enrolledStudents', format: 'number' },
         { label: 'Pending Applications', key: 'pendingApplications', format: 'number' },

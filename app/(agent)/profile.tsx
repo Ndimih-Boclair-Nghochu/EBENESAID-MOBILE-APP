@@ -6,6 +6,8 @@ export default function AgentProfileScreen() {
       portalName="Agent Profile"
       subtitle="Business identity and contact details."
       endpoint="/api/agent/profile"
+      profileImageRole="agent"
+      profileImageField="logoUrl"
       fields={[
         { key: 'businessName', label: 'Business name' },
         { key: 'contactPerson', label: 'Contact person' },

@@ -16,7 +16,10 @@ export default function AdminLayout() {
         'ai-knowledge',
         'ai-feedback',
         'community-circles',
-        'task-templates'
+        'task-templates',
+        'commissions',
+        'reports',
+        'statistics'
       ]}
       tabs={[
         { name: 'index', title: 'Dashboard', activeIcon: 'stats-chart', inactiveIcon: 'stats-chart-outline' },

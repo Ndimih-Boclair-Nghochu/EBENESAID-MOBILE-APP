@@ -6,6 +6,7 @@ export default function JobPartnerSummaryScreen() {
       portalName="Job Partner Portal"
       subtitle="Posted jobs, applicants, and hiring outcomes."
       endpoint="/api/job-partner/summary"
+      showAssistant
       metrics={[
         { label: 'Active Jobs', key: 'activeJobs', format: 'number' },
         { label: 'Total Applicants', key: 'totalApplicants', format: 'number' },

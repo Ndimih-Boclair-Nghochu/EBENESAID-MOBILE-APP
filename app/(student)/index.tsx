@@ -10,7 +10,9 @@ import { RefreshControl,
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Circle } from 'react-native-svg';
 
+import { AIAssistantFAB } from '@/src/components/AIAssistantFAB';
 import { Badge } from '@/src/components/ui/Badge';
 import { Card } from '@/src/components/ui/Card';
 import { EmptyState } from '@/src/components/ui/EmptyState';
@@ -28,6 +30,7 @@ import type { StudentOverview } from '@/src/features/student/types';
 import {
   formatDate,
   formatRelativeTime,
+  clampPercent,
   getGreeting,
   studentQueryTimes
 } from '@/src/features/student/utils';
@@ -107,6 +110,7 @@ export default function StudentDashboardScreen() {
           <Ionicons name="refresh" size={24} color={colors.primary} />
         </Pressable>
       ) : null}
+      <AIAssistantFAB />
     </SafeAreaView>
   );
 }
@@ -114,18 +118,26 @@ export default function StudentDashboardScreen() {
 function DashboardHeader({ overview }: { overview: StudentOverview }) {
   return (
     <PagePadding style={styles.headerPadding}>
-      <View>
-        <Text style={styles.title}>
-          {getGreeting()}, {overview.firstName}
-        </Text>
-        <Text style={styles.subtitle}>{overview.university}</Text>
+      <View style={styles.heroRow}>
+        <View style={styles.heroCopy}>
+          <Text style={styles.title}>
+            {getGreeting()}, {overview.firstName}
+          </Text>
+          <Text style={styles.subtitle}>{overview.university}</Text>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open messages"
+          onPress={() => router.push('/(student)/messages')}
+          style={styles.notificationButton}
+        >
+          <Ionicons name="notifications-outline" size={22} color={colors.secondary} />
+        </Pressable>
       </View>
 
       <Card style={styles.progressCard}>
         <View style={styles.progressTop}>
-          <View style={styles.circleProgress}>
-            <Text style={styles.circleText}>{Math.round(overview.completionPercent)}%</Text>
-          </View>
+          <CircularProgressRing percent={overview.completionPercent} />
           <View style={styles.progressCopy}>
             <Text style={styles.cardTitle}>Relocation progress</Text>
             <Text style={styles.cardSubtitle}>
@@ -138,8 +150,23 @@ function DashboardHeader({ overview }: { overview: StudentOverview }) {
 
       <View style={styles.quickActions}>
         <QuickAction
+          icon="business-outline"
+          label="Housing"
+          onPress={() => router.push('/(student)/housing')}
+        />
+        <QuickAction
+          icon="briefcase-outline"
+          label="Jobs"
+          onPress={() => router.push('/(student)/jobs')}
+        />
+        <QuickAction
+          icon="restaurant-outline"
+          label="Food"
+          onPress={() => router.push('/(student)/food')}
+        />
+        <QuickAction
           icon="document-text-outline"
-          label="Documents"
+          label="Docs"
           onPress={() => router.push('/(student)/documents')}
         />
         <QuickAction
@@ -148,14 +175,9 @@ function DashboardHeader({ overview }: { overview: StudentOverview }) {
           onPress={() => router.push('/(student)/arrival')}
         />
         <QuickAction
-          icon="restaurant-outline"
-          label="Food"
-          onPress={() => router.push('/(student)/food')}
-        />
-        <QuickAction
-          icon="school-outline"
-          label="Programs"
-          onPress={() => router.push('/(student)/programs')}
+          icon="people-outline"
+          label="Community"
+          onPress={() => router.push('/(student)/community')}
         />
       </View>
 
@@ -220,6 +242,45 @@ function QuickAction({
   );
 }
 
+function CircularProgressRing({ percent }: { percent: number }) {
+  const clampedPercent = clampPercent(percent);
+  const radius = 29;
+  const strokeWidth = 7;
+  const size = 72;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (circumference * clampedPercent) / 100;
+
+  return (
+    <View style={styles.circleProgress}>
+      <Svg width={size} height={size}>
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={colors.neutralSoft}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={colors.secondary}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={`${circumference} ${circumference}`}
+          strokeDashoffset={offset}
+          fill="transparent"
+          rotation="-90"
+          originX={size / 2}
+          originY={size / 2}
+        />
+      </Svg>
+      <Text style={styles.circleText}>{clampedPercent}%</Text>
+    </View>
+  );
+}
+
 function ActivityRow({ activity }: { activity: Activity }) {
   return (
     <Card style={styles.activityCard}>
@@ -253,6 +314,24 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: spacing.xs
   },
+  heroRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.md
+  },
+  heroCopy: {
+    flex: 1
+  },
+  notificationButton: {
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    borderColor: colors.border,
+    borderRadius: 24,
+    borderWidth: 1,
+    height: 48,
+    justifyContent: 'center',
+    width: 48
+  },
   progressCard: {
     gap: spacing.md
   },
@@ -263,14 +342,12 @@ const styles = StyleSheet.create({
   },
   circleProgress: {
     alignItems: 'center',
-    borderColor: colors.secondary,
-    borderRadius: 34,
-    borderWidth: 5,
-    height: 68,
+    height: 72,
     justifyContent: 'center',
-    width: 68
+    width: 72
   },
   circleText: {
+    position: 'absolute',
     ...typography.headingSmall,
     color: colors.secondary
   },
@@ -293,13 +370,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.card,
     borderColor: colors.border,
-    borderRadius: 16,
+    borderRadius: 8,
     borderWidth: 1,
     gap: spacing.xs,
-    minHeight: 82,
+    minHeight: 76,
     justifyContent: 'center',
     padding: spacing.sm,
-    width: '48%'
+    width: '31%'
   },
   quickActionText: {
     ...typography.label,
@@ -342,7 +419,7 @@ const styles = StyleSheet.create({
     height: 56,
     justifyContent: 'center',
     position: 'absolute',
-    right: spacing.xl,
+    right: 92,
     width: 56
   }
 });
