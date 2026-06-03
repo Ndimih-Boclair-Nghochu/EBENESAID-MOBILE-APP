@@ -2,6 +2,7 @@ import axios from 'axios';
 import { router } from 'expo-router';
 
 import { api } from '@/src/lib/api';
+import { clearQueryCache } from '@/src/lib/queryClient';
 import { getPortalRoute } from '@/src/lib/roleRoutes';
 import { persistSessionFromAuthPayload } from '@/src/lib/storage';
 import { useAuthStore } from '@/src/stores/authStore';
@@ -72,6 +73,7 @@ export function useAuth() {
       });
 
       await persistSessionFromAuthPayload(response.data);
+      await clearQueryCache();
 
       const user = extractUser(response.data);
       auth.setUser(user);
@@ -114,6 +116,7 @@ export function useAuth() {
     }
 
     await persistSessionFromAuthPayload(response.data);
+    await clearQueryCache();
     auth.setUser(responseUser);
     router.replace(getPortalRoute(responseUser.userType));
     return responseUser;

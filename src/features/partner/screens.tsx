@@ -188,24 +188,36 @@ export function extractArray(data: unknown, keys: string[]): PartnerRecord[] {
     return [];
   }
 
-  const records = keys.flatMap((key) => {
-    const value = data[key];
-    return Array.isArray(value) ? value.filter(isRecord) : [];
-  });
+  const containers = [data, ...nestedRecords(data)];
+  const records = containers.flatMap((container) =>
+    keys.flatMap((key) => {
+      const value = container[key];
+      return Array.isArray(value) ? value.filter(isRecord) : [];
+    })
+  );
 
   return records;
 }
 
 export function extractRecord(data: unknown): PartnerRecord {
-  if (isRecord(data)) {
-    return data;
+  if (!isRecord(data)) {
+    return {};
   }
 
-  return {};
+  return {
+    ...nestedRecords(data).reduce<PartnerRecord>((merged, record) => ({ ...merged, ...record }), {}),
+    ...data
+  };
 }
 
 export function isRecord(value: unknown): value is PartnerRecord {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function nestedRecords(record: PartnerRecord): PartnerRecord[] {
+  return ['overview', 'metrics', 'summary', 'totals', 'statistics', 'finance', 'institutions', 'partnerProfile']
+    .map((key) => record[key])
+    .filter(isRecord);
 }
 
 export function statusTone(status: unknown): StatusBadgeTone {
@@ -326,7 +338,15 @@ export function SummaryScreen({
   }
 
   const data = extractRecord(query.data);
-  const activity = extractArray(query.data, activityKeys);
+  const activity = extractArray(query.data, [
+    ...activityKeys,
+    'workQueues',
+    'queues',
+    'recentEvents',
+    'recentBookings',
+    'recentOrders',
+    'recentApplications'
+  ]);
   const metricValues = metrics.map((metric) => ({
     ...metric,
     value: formatValue(data[metric.key], metric.format)

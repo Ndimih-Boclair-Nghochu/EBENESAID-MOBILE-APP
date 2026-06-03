@@ -7,7 +7,7 @@ import {
 
 import { QUERY_CACHE_STORAGE_KEY, queryStorage } from './storage';
 
-const queryCacheBuster = 'phase-1';
+const queryCacheBuster = 'phase-2-resilient-account-loading';
 let persistenceInitialized = false;
 
 export const queryClient = new QueryClient({
