@@ -30,6 +30,31 @@ async function fetchOverview() {
   return r.data;
 }
 
+function getSafeProfile(ov: StudentOverview): StudentOverview['profile'] {
+  return {
+    firstName: ov.profile?.firstName ?? 'there',
+    lastName: ov.profile?.lastName ?? '',
+    email: ov.profile?.email ?? '',
+    phone: ov.profile?.phone ?? '',
+    whatsapp: ov.profile?.whatsapp ?? '',
+    nationality: ov.profile?.nationality ?? '',
+    currentCountry: ov.profile?.currentCountry ?? '',
+    destinationCountry: ov.profile?.destinationCountry ?? 'Latvia',
+    destinationCity: ov.profile?.destinationCity ?? '',
+    preferredSchool: ov.profile?.preferredSchool ?? '',
+    preferredProgram: ov.profile?.preferredProgram ?? '',
+    emergencyContactName: ov.profile?.emergencyContactName ?? '',
+    emergencyContactPhone: ov.profile?.emergencyContactPhone ?? '',
+    emergencyContactRelationship: ov.profile?.emergencyContactRelationship ?? '',
+    passportNumberMasked: ov.profile?.passportNumberMasked ?? '',
+    passportExpiryDate: ov.profile?.passportExpiryDate ?? '',
+    profilePhotoUrl: ov.profile?.profilePhotoUrl ?? '',
+    university: ov.profile?.university ?? '',
+    countryOfOrigin: ov.profile?.countryOfOrigin ?? '',
+    completionPercent: ov.profile?.completionPercent ?? 0
+  };
+}
+
 export default function StudentDashboardScreen() {
   const query = useQuery<StudentOverview>({
     queryKey: ['student', 'overview'],
@@ -57,7 +82,7 @@ export default function StudentDashboardScreen() {
 
   const ov = query.data;
   // The backend returns a nested StudentRelocationOverview
-  const profile = ov.profile;
+  const profile = getSafeProfile(ov);
   const tasks = ov.dashboard?.tasks ?? [];
 
   return (

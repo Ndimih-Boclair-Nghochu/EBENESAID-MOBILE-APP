@@ -21,16 +21,63 @@ export const api = axios.create({
 
 function emptyStudentOverview(user: SafeUser | null) {
   return {
-    firstName: user?.firstName ?? 'there',
-    completionPercent: 0,
-    nextSteps: [],
-    housingStatus: null,
-    jobsCount: 0,
-    communityCirclesCount: 0,
-    recentActivity: [],
-    university: user?.university ?? '',
-    countryOfOrigin: user?.countryOfOrigin ?? '',
-    arrivalDate: null
+    profile: {
+      firstName: user?.firstName ?? 'there',
+      lastName: user?.lastName ?? '',
+      email: user?.email ?? '',
+      phone: user?.phone ?? '',
+      whatsapp: '',
+      nationality: '',
+      currentCountry: user?.countryOfOrigin ?? '',
+      destinationCountry: 'Latvia',
+      destinationCity: '',
+      preferredSchool: user?.university ?? '',
+      preferredProgram: '',
+      emergencyContactName: '',
+      emergencyContactPhone: '',
+      emergencyContactRelationship: '',
+      passportNumberMasked: '',
+      passportExpiryDate: '',
+      profilePhotoUrl: user?.avatar ?? '',
+      university: user?.university ?? '',
+      countryOfOrigin: user?.countryOfOrigin ?? '',
+      completionPercent: 0
+    },
+    onboarding: {
+      programDurationBand: null,
+      onboardingCompleted: false
+    },
+    dashboard: {
+      tasks: [],
+      guidance: 'Complete your profile to activate your relocation dashboard.'
+    },
+    housing: {
+      savedCount: 0,
+      requestCount: 0,
+      bookingCount: 0,
+      recentRequests: []
+    },
+    documents: {
+      total: 0,
+      verified: 0,
+      rejected: 0,
+      pending: 0
+    },
+    applications: {
+      schoolCount: 0,
+      jobCount: 0
+    },
+    orders: {
+      foodCount: 0
+    },
+    arrival: null,
+    payments: [],
+    support: {
+      status: 'open',
+      priority: 'normal',
+      updatedAt: null
+    },
+    notifications: []
   };
 }
 
