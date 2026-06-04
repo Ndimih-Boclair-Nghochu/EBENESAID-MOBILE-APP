@@ -52,7 +52,7 @@ function getAccountFallback(path: string, user: SafeUser | null): unknown | unde
     '/api/student/profile': { profile: user ?? {} },
     '/api/student/housing': { listings: [], favorites: [], activeRequests: [] },
     '/api/jobs': { jobs: [], applications: [] },
-    '/api/food': { menu: [], orders: [] },
+    '/api/food': { items: [], orders: [], todayNewItemCount: 0 },
     '/api/student/documents': { documents: [] },
     '/api/student/programs': { programs: [], applications: [] },
     '/api/student/community': { circles: [], events: [], buddyMatches: [] },
