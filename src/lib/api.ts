@@ -128,13 +128,14 @@ function buildFallbackResponse(error: unknown): AxiosResponse | null {
   }
 
   const status = error.response?.status;
+  const user = useAuthStore.getState().user;
 
-  if (status === 401 || status === 429) {
+  if (status === 429 || (status === 401 && !user)) {
     return null;
   }
 
   const path = getEndpointPath(error.config?.url);
-  const fallback = getAccountFallback(path, useAuthStore.getState().user);
+  const fallback = getAccountFallback(path, user);
 
   if (fallback === undefined) {
     return null;
@@ -260,13 +261,13 @@ api.interceptors.response.use(
       toast.info('Too many requests. Please wait.');
     }
 
-    await handleUnauthorizedSession(error);
-
     const fallbackResponse = buildFallbackResponse(error);
 
     if (fallbackResponse) {
       return fallbackResponse;
     }
+
+    await handleUnauthorizedSession(error);
 
     return Promise.reject(error);
   }
