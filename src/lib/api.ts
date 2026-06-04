@@ -178,8 +178,26 @@ function setHeader(config: InternalAxiosRequestConfig, name: string, value: stri
   config.headers[name] = value;
 }
 
+function hasHeader(config: InternalAxiosRequestConfig, name: string): boolean {
+  if (typeof config.headers.has === 'function') {
+    return config.headers.has(name);
+  }
+
+  return (
+    config.headers[name] !== undefined ||
+    config.headers[name.toLowerCase()] !== undefined ||
+    config.headers[name.toUpperCase()] !== undefined
+  );
+}
+
+function setHeaderIfMissing(config: InternalAxiosRequestConfig, name: string, value: string): void {
+  if (!hasHeader(config, name)) {
+    setHeader(config, name, value);
+  }
+}
+
 function setCookieHeader(config: InternalAxiosRequestConfig, cookieHeader: string): void {
-  setHeader(config, 'Cookie', cookieHeader);
+  setHeaderIfMissing(config, 'Cookie', cookieHeader);
 }
 
 let sessionRedirectInFlight = false;
@@ -222,9 +240,9 @@ api.interceptors.request.use(async (config) => {
   }
 
   if (sessionToken) {
-    setHeader(config, 'Authorization', `Bearer ${sessionToken}`);
-    setHeader(config, 'X-EBENESAID-Session', sessionToken);
-    setHeader(config, 'X-Session-Token', sessionToken);
+    setHeaderIfMissing(config, 'Authorization', `Bearer ${sessionToken}`);
+    setHeaderIfMissing(config, 'X-EBENESAID-Session', sessionToken);
+    setHeaderIfMissing(config, 'X-Session-Token', sessionToken);
   }
 
   return config;

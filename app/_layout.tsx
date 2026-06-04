@@ -19,7 +19,6 @@ import {
   setupNotificationListeners
 } from '@/src/lib/notifications';
 import { initializeQueryPersistence, queryClient } from '@/src/lib/queryClient';
-import { getSessionToken } from '@/src/lib/storage';
 import { useAuthStore } from '@/src/stores/authStore';
 
 const protectedRouteGroups = new Set([
@@ -62,27 +61,6 @@ function AppChrome() {
     if (!isAuthenticated || !user) {
       router.replace('/landing');
     }
-  }, [hasHydrated, isAuthenticated, isProtectedRoute, user]);
-
-  useEffect(() => {
-    if (!hasHydrated || !isProtectedRoute || !isAuthenticated || !user) {
-      return;
-    }
-
-    let isMounted = true;
-
-    void getSessionToken().then(async (sessionToken) => {
-      if (!isMounted || sessionToken) {
-        return;
-      }
-
-      await useAuthStore.getState().clearAuth();
-      router.replace('/landing');
-    });
-
-    return () => {
-      isMounted = false;
-    };
   }, [hasHydrated, isAuthenticated, isProtectedRoute, user]);
 
   return (

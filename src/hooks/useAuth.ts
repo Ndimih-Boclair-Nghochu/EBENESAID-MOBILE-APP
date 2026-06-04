@@ -47,6 +47,25 @@ function extractOptionalUser(data: unknown): SafeUser | null {
   return null;
 }
 
+function buildSessionHeaders(sessionToken: string) {
+  return {
+    Authorization: `Bearer ${sessionToken}`,
+    Cookie: `eb_session=${sessionToken}`,
+    'X-EBENESAID-Session': sessionToken,
+    'X-Session-Token': sessionToken
+  };
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+const mobileAuthHeaders = {
+  'X-EBENESAID-Client': 'mobile'
+};
+
 export function getHttpStatus(error: unknown): number | undefined {
   return axios.isAxiosError(error) ? error.response?.status : undefined;
 }
@@ -63,15 +82,33 @@ export function getApiMessage(error: unknown): string | undefined {
 export function useAuth() {
   const auth = useAuthStore();
 
-  const verifyMobileSession = async (): Promise<SafeUser> => {
-    const sessionToken = await getSessionToken();
+  const verifyMobileSession = async (freshSessionToken?: string | null): Promise<SafeUser> => {
+    const sessionToken = freshSessionToken === undefined ? await getSessionToken() : freshSessionToken;
 
-    if (!sessionToken) {
-      throw new Error('The server did not return a mobile session. Please sign in again.');
+    const delays = [0, 300, 900];
+    let lastError: unknown;
+
+    for (const retryDelay of delays) {
+      if (retryDelay > 0) {
+        await delay(retryDelay);
+      }
+
+      try {
+        const response = await api.get<AuthMeResponse | SafeUser>(
+          '/api/auth/me',
+          sessionToken ? { headers: buildSessionHeaders(sessionToken) } : undefined
+        );
+        return extractUser(response.data);
+      } catch (error) {
+        lastError = error;
+
+        if (!axios.isAxiosError(error) || error.response?.status !== 401) {
+          throw error;
+        }
+      }
     }
 
-    const response = await api.get<AuthMeResponse | SafeUser>('/api/auth/me');
-    return extractUser(response.data);
+    throw lastError;
   };
 
   const login = async (email: string, password: string): Promise<AuthLoginResponse> => {
@@ -80,24 +117,31 @@ export function useAuth() {
     try {
       const response = await api.post<AuthLoginResponse>('/api/auth/login', {
         email,
-        password
+        password,
+        clientType: 'mobile'
+      }, {
+        headers: mobileAuthHeaders
       });
 
-      await persistSessionFromAuthPayload(response.data);
+      const responseUser = extractOptionalUser(response.data);
+      if (!responseUser) {
+        throw new Error('Signed in, but the server did not return your account details. Please try again.');
+      }
+
+      const sessionToken = await persistSessionFromAuthPayload(response.data);
       await clearQueryCache();
 
       let user: SafeUser;
 
       try {
-        user = await verifyMobileSession();
+        user = await verifyMobileSession(sessionToken);
       } catch (verificationError) {
-        await auth.clearAuth();
-
         if (axios.isAxiosError(verificationError) && verificationError.response?.status === 401) {
-          throw new Error('Signed in, but the mobile session could not be verified. Please try again.');
+          user = responseUser;
+        } else {
+          await auth.clearAuth();
+          throw verificationError;
         }
-
-        throw verificationError;
       }
 
       auth.setUser(user);
@@ -139,11 +183,11 @@ export function useAuth() {
       return null;
     }
 
-    await persistSessionFromAuthPayload(response.data);
+    const sessionToken = await persistSessionFromAuthPayload(response.data);
     await clearQueryCache();
 
     try {
-      const verifiedUser = await verifyMobileSession();
+      const verifiedUser = await verifyMobileSession(sessionToken);
       auth.setUser(verifiedUser);
       router.replace(getPortalRoute(verifiedUser.userType));
       return verifiedUser;
